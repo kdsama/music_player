@@ -42,3 +42,4 @@ jobs:
         with:
           name: musicPlayer
           path: dist/
+          retention-days: 5
