@@ -1,4 +1,4 @@
-name: Build Only - x86
+name: Build Only - x86 MacOS
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
