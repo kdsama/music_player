@@ -1,0 +1,34 @@
+name: Build Only - x86
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Branch Name'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.branch_name }}
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install python3-pyqt5
+          pip install pyinstaller
+          pip install -r src/requirements.txt
+          
+      - name: Build the app
+        run: |
+          pyinstaller --name=musicPlayer --windowed src/main.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: musicPlayer
+          path: dist/
