@@ -16,13 +16,23 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch_name }}
       
-      - name: Install dependencies
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install PyQT5
+        shell: powershell
         run: |
-          sudo apt-get update
-          sudo apt-get install python3-pyqt5
-          pip install pyinstaller
-          pip install -r src/requirements.txt
-          
+          choco install qt5 -y --params "/AddToPath"
+          pip install pyqt5
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Install other Python dependencies
+        run: pip install -r src/requirements.txt
+
       - name: Build the app
         run: |
           pyinstaller --name=musicPlayer --windowed src/main.py
