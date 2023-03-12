@@ -8,11 +8,13 @@ class Song:
         self.album = album
     
     def play(self):
-        # play the song
+        # The object of the song will already would have been initiated . 
+        # This function will play the song. Its better if it calls a service which plays the song. 
+        # You may need to add more values to the constructor to run this. 
         pass
     
     def load(self):
-        # load the song
+        # Happens before playing it 
         pass
     
     def pause(self):

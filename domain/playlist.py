@@ -10,13 +10,17 @@ class Playlist:
     
     def savePlaylist(self):
         # save the playlist
+        # db querying . Insert . Validation required for :- 
+        # if the entries being passed are correct or not . 
         pass
     
     def getPlaylistByName(self, name):
         # get the playlist by name
+        # straight forward db querying
         pass
     
     def getAllPlaylistsOfUser(self, user_id):
         # get all playlists of a user
+        # straight forward db querying
         pass
 
