@@ -91,8 +91,11 @@ while True:
     screen.fill((0, 0, 0))
     current_time_text = font.render(current_time_str, True, (255, 255, 255))
     music_length_text = font.render(music_length_str, True, (255, 255, 255))
+    current_music_text = font.render(current_music[:len(current_music)-4], True, (255, 255, 255))
+
     screen.blit(current_time_text, (10, 30))
     screen.blit(music_length_text, (500, 30))
+    screen.blit(current_music_text, (10, 100))
 
     # Store play information in a json file
     current_time = pygame.mixer.music.get_pos() // 1000
