@@ -2,6 +2,7 @@ import pygame
 import json
 import sqlite3
 from mutagen.mp3 import MP3
+from time import sleep
 
 # Initialize pygame
 pygame.init()
@@ -32,7 +33,12 @@ pygame.mixer.music.load(current_music)
 
 # set volume
 pygame.mixer.music.set_volume(0.5)
+
+#10 seconds
 FAST_FORWARD_OFFSET = 10000
+
+#Used for fast forward
+change_time = 0
 
 # play music
 pygame.mixer.music.play()
@@ -60,9 +66,10 @@ while True:
                 pygame.mixer.music.play(0, new_time // 1000)
             elif event.key == pygame.K_RIGHT:
                 # fast forward
-                current_time = pygame.mixer.music.get_pos()
+                change_time += 10000
+                current_time = pygame.mixer.music.get_pos() + change_time
                 new_time = current_time + FAST_FORWARD_OFFSET
-                pygame.mixer.music.play(new_time // 1000)
+                pygame.mixer.music.set_pos(new_time/1000)
             elif event.key == pygame.K_UP:
                 # previous song
                 pygame.mixer.music.stop()
@@ -78,8 +85,10 @@ while True:
                 pygame.mixer.music.load(current_music)
                 pygame.mixer.music.play()
     
+    #Update once every 0.1 second
+    sleep(0.1)
     # Get the current playing time
-    current_time = pygame.mixer.music.get_pos() / 1000
+    current_time = (pygame.mixer.music.get_pos() + change_time) / 1000
 
     # Format time as minutes:seconds
     audio = MP3(current_music)
@@ -98,7 +107,6 @@ while True:
     screen.blit(current_music_text, (10, 100))
 
     # Store play information in a json file
-    current_time = pygame.mixer.music.get_pos() // 1000
     music_info = {"current_music": current_music}
     with open("music_info.json", "w") as f:
         json.dump(music_info, f)
