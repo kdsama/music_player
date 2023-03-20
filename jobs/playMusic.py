@@ -87,7 +87,7 @@ while True:
     current_time_str = f"{int(current_time // 60):02}:{int(current_time % 60):02}"
     music_length_str = f"{int(music_length // 60):02}:{int(music_length % 60):02}"
 
-    # Display current time and music length
+    # Display current time , music length and song name
     screen.fill((0, 0, 0))
     current_time_text = font.render(current_time_str, True, (255, 255, 255))
     music_length_text = font.render(music_length_str, True, (255, 255, 255))
