@@ -60,16 +60,16 @@ while True:
                     pygame.mixer.music.unpause()
             elif event.key == pygame.K_LEFT:
                 # rewind
-                current_time = pygame.mixer.music.get_pos()
-                pygame.mixer.music.rewind()
-                new_time = current_time - FAST_FORWARD_OFFSET
-                pygame.mixer.music.play(0, new_time // 1000)
+                change_time -= FAST_FORWARD_OFFSET
+                new_time = pygame.mixer.music.get_pos()+change_time
+                pygame.mixer.music.set_pos(new_time/1000)
+
             elif event.key == pygame.K_RIGHT:
                 # fast forward
-                change_time += 10000
-                current_time = pygame.mixer.music.get_pos() + change_time
-                new_time = current_time + FAST_FORWARD_OFFSET
+                change_time += FAST_FORWARD_OFFSET
+                new_time = pygame.mixer.music.get_pos()+change_time
                 pygame.mixer.music.set_pos(new_time/1000)
+
             elif event.key == pygame.K_UP:
                 # previous song
                 pygame.mixer.music.stop()
