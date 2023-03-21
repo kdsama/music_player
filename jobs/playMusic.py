@@ -1,10 +1,12 @@
 import pygame
 import json
 import sqlite3
+import os
 from mutagen.mp3 import MP3
 
 # Initialize pygame
 pygame.init()
+music_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../test_music/')
 
 # Connect to the database
 conn = sqlite3.connect("music_database.db")
@@ -18,7 +20,7 @@ music_artist = [row[3] for row in c.fetchall()]
 
 # Get the first song in the music list
 current_music_index = 0
-current_music = music_list[current_music_index]
+current_music = music_dir + music_list[current_music_index]
 
 # create window
 screen = pygame.display.set_mode((640, 480))
@@ -56,30 +58,35 @@ while True:
                 # rewind
                 current_time = pygame.mixer.music.get_pos()
                 pygame.mixer.music.rewind()
-                new_time = current_time - FAST_FORWARD_OFFSET
-                pygame.mixer.music.play(0, new_time // 1000)
+                new_time = (current_time // 1000) - (FAST_FORWARD_OFFSET // 1000)
+                current_time = new_time
+                pygame.mixer.music.set_pos(new_time)
+                # pygame.mixer.music.play(start=new_time)
             elif event.key == pygame.K_RIGHT:
                 # fast forward
                 current_time = pygame.mixer.music.get_pos()
-                new_time = current_time + FAST_FORWARD_OFFSET
-                pygame.mixer.music.play(new_time // 1000)
+                new_time = (current_time // 1000) + (FAST_FORWARD_OFFSET // 1000)
+                current_time = new_time
+                pygame.mixer.music.set_pos(new_time)
+                # pygame.mixer.music.play(start=new_time)
             elif event.key == pygame.K_UP:
                 # previous song
                 pygame.mixer.music.stop()
                 current_music_index = (current_music_index - 1) % len(music_list)
-                current_music = music_list[current_music_index]
+                current_music = music_dir + music_list[current_music_index]
                 pygame.mixer.music.load(current_music)
                 pygame.mixer.music.play()
             elif event.key == pygame.K_DOWN:
                 # next song
                 pygame.mixer.music.stop()
                 current_music_index = (current_music_index + 1) % len(music_list)
-                current_music = music_list[current_music_index]
+                current_music = music_dir + music_list[current_music_index]
                 pygame.mixer.music.load(current_music)
                 pygame.mixer.music.play()
     
     # Get the current playing time
-    current_time = pygame.mixer.music.get_pos() / 1000
+    current_time = pygame.mixer.music.get_pos() // 1000
+    # print(current_time)
 
     # Format time as minutes:seconds
     audio = MP3(current_music)

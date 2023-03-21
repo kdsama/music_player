@@ -3,7 +3,7 @@ import sqlite3
 from mutagen.mp3 import MP3
 
 # The directory path where the music files are located
-music_dir = '../test_music'
+music_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../test_music')
 
 # Connect to SQLite database
 conn = sqlite3.connect('music_database.db')
