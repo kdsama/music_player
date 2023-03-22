@@ -1,3 +1,11 @@
+import pygame
+import json
+import sqlite3
+import os
+from mutagen.mp3 import MP3
+from time import sleep
+
+
 class Song:
     def __init__(self, id, name, album_id, created_at, location, album):
         self.id = id
@@ -14,7 +22,8 @@ class Song:
         pass
     
     def load(self):
-        # Happens before playing it 
+        # Happens before playing it
+        pygame.init()
         pass
     
     def pause(self):
@@ -25,6 +34,6 @@ class Song:
         # go back n seconds in the song
         pass
     
-    def go_front(self, n):
+    def go_front(self, n): 
         # go forward n seconds in the song
         pass

@@ -22,6 +22,8 @@ music_artist = [row[3] for row in c.fetchall()]
 # Get the first song in the music list
 current_music_index = 0
 current_music = music_dir + music_list[current_music_index]
+audio = MP3(current_music)
+music_length = audio.info.length
 
 # create window
 screen = pygame.display.set_mode((640, 480))
@@ -63,17 +65,28 @@ while True:
             elif event.key == pygame.K_LEFT:
                 # rewind
                 change_time -= FAST_FORWARD_OFFSET
-                new_time = pygame.mixer.music.get_pos()+change_time
-                pygame.mixer.music.set_pos(new_time/1000)
-
+                new_time = pygame.mixer.music.get_pos() + change_time
+                # if new_time < 0:
+                #     new_time -= new_time
+                # try:
+                pygame.mixer.music.set_pos(new_time / 1000)
+                # except:
+                #     pygame.mixer.music.play(0)
             elif event.key == pygame.K_RIGHT:
                 # fast forward
                 change_time += FAST_FORWARD_OFFSET
-                new_time = pygame.mixer.music.get_pos()+change_time
+                new_time = pygame.mixer.music.get_pos() + change_time
+                # if new_time >= music_length * 1000:
+                #     change_time = 0
+                #     pygame.mixer.music.stop()
+                #     current_music_index = (current_music_index + 1) % len(music_list)
+                #     current_music = music_dir + music_list[current_music_index]
+                #     pygame.mixer.music.load(current_music)
+                #     pygame.mixer.music.play()
                 pygame.mixer.music.set_pos(new_time/1000)
-
             elif event.key == pygame.K_UP:
                 # previous song
+                change_time = 0
                 pygame.mixer.music.stop()
                 current_music_index = (current_music_index - 1) % len(music_list)
                 current_music = music_dir + music_list[current_music_index]
@@ -81,20 +94,27 @@ while True:
                 pygame.mixer.music.play()
             elif event.key == pygame.K_DOWN:
                 # next song
+                change_time = 0
                 pygame.mixer.music.stop()
                 current_music_index = (current_music_index + 1) % len(music_list)
                 current_music = music_dir + music_list[current_music_index]
                 pygame.mixer.music.load(current_music)
                 pygame.mixer.music.play()
+            elif event.key == pygame.K_LEFT and pygame.key.get_mods() & pygame.KMOD_CTRL:
+                pygame.mixer.music.set_volume(0.1)
     
     #Update once every 0.1 second
     sleep(0.1)
     # Get the current playing time
+    # if (pygame.mixer.music.get_pos() + change_time) / 1000 < 0:
+    #     pygame.mixer.music.rewind()
+    # elif (pygame.mixer.music.get_pos() + change_time) / 1000 > music_length:
+    #     event.key = pygame.K_DOWN
+    # else:
+    #     current_time = (pygame.mixer.music.get_pos() + change_time) / 1000
     current_time = (pygame.mixer.music.get_pos() + change_time) / 1000
 
     # Format time as minutes:seconds
-    audio = MP3(current_music)
-    music_length = audio.info.length
     current_time_str = f"{int(current_time // 60):02}:{int(current_time % 60):02}"
     music_length_str = f"{int(music_length // 60):02}:{int(music_length % 60):02}"
 
@@ -102,7 +122,7 @@ while True:
     screen.fill((0, 0, 0))
     current_time_text = font.render(current_time_str, True, (255, 255, 255))
     music_length_text = font.render(music_length_str, True, (255, 255, 255))
-    current_music_text = font.render(current_music[:len(current_music)-4], True, (255, 255, 255))
+    current_music_text = font.render(music_list[current_music_index], True, (255, 255, 255))
 
     screen.blit(current_time_text, (10, 30))
     screen.blit(music_length_text, (500, 30))
