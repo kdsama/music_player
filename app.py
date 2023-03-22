@@ -48,7 +48,7 @@ class MusicPlayerApp(QMainWindow):
     def open_music_file(self):
         music_path, _ = QFileDialog.getOpenFileName(self, "Open the Music File", "", "MP3 (*.mp3);;All Files (*)")
         if music_path:
-            self.music_list.addItem(song_path)
+            self.music_list.addItem(music_path)
             self.music_player.setMedia(QMediaContent(QUrl.fromLocalFile(music_path)))
 
     def play_music(self):
