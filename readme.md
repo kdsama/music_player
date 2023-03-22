@@ -1,6 +1,19 @@
 # Music Player
 Music Player for Comp530 Group Project 
 
+## UI
+- app.py
+
+## Utils
+ - utils/play.py
+ - utils/db.py
+ - ...
+
+## Debug in local
+```shell
+python app.py
+```
+
 ## Build Status
 [![Build Only - x86 Windows](https://github.com/kdsama/music_player/actions/workflows/build-windows-x86.yml/badge.svg)](https://github.com/kdsama/music_player/actions/workflows/build-windows-x86.yml)
 [![Build Only - x86 MacOS](https://github.com/kdsama/music_player/actions/workflows/build-macos-x86.yml/badge.svg)](https://github.com/kdsama/music_player/actions/workflows/build-macos-x86.yml)

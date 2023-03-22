@@ -1,1 +1,3 @@
-import 
+PyQt5
+pygame
+mutagen
