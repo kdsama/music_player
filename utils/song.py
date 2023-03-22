@@ -37,10 +37,16 @@ def wait(n):
     # wait for n seconds before doing anything 
     pygame.time.wait(n*1000)
 
+def stop():
+    pygame.mixer.music.stop()
+
 def waitAndKill(n):
     #wait for n seconds and stop the song , or whatever song that is being played. 
     pygame.time.wait(n*1000)
     pygame.mixer.music.stop()
+
+def the_song_is_playing():
+    return pygame.mixer.music.get_busy()
 
 def pause():
     pygame.mixer.music.pause()
