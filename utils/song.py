@@ -14,6 +14,7 @@ def metaData(song_path):
     metadata['artist'] = audio['TPE1'].text[0] if 'TPE1' in audio else ''
     metadata['album'] = audio['TALB'].text[0] if 'TALB' in audio else ''
     metadata['duration'] = audio.info.length
+    metadata["path"] = song_path
     return metadata
 
 

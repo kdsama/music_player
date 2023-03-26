@@ -18,7 +18,7 @@ class SongService:
         self.album = metadata["album"]
         self.artist = metadata["artist"]
         self.duration = metadata["duration"]
-        self.location = path
+        self.path = path
         self.paused = False 
         # self.initialize =      
         
@@ -27,8 +27,8 @@ class SongService:
     
     def play(self): 
         # You may need to add more values to the constructor to run this. 
-        # SongFunction.play(self.location)
-        utils.song.play(self.location)
+        # SongFunction.play(self.path)
+        utils.song.play(self.path)
         self.wait(int(self.duration))
         
      

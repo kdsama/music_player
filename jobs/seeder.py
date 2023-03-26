@@ -5,42 +5,57 @@ c = conn.cursor()
 
 
 def seeder():
-    user()
+    
     songs()
     playlists()
-    albums()
+    activity()
     
 
-def user():
-    c.execute('''
-          CREATE TABLE IF NOT EXISTS user
-          ([id] TEXT PRIMARY KEY, [email] TEXT UNIQUE)
-          ''')    
-    c.execute("""INSERT INTO user (id, email)VALUES(?,?)""",(hash.GenerateID(),"kd1@gmail.com"))
-    
 
-def albums():
-    c.execute('''
-          CREATE TABLE IF NOT EXISTS albums
-          ([id] TEXT PRIMARY KEY, [name] TEXT, [artist_name] TEXT, [createdAt] INTEGER,
-          [image_url] TEXT)
-          ''')
-    
 
 def playlists():
     c.execute('''
-      CREATE TABLE IF NOT EXISTS playlists
-      ([id] TEXT PRIMARY KEY, [song_ids] TEXT, [user_id] TEXT, [createdAt] INTEGER,[updatedAt] INTEGER,[deleted] BOOLEAN
-      [image_url] TEXT)
+        CREATE TABLE playlist (
+          id INTEGER PRIMARY KEY,
+          name TEXT,
+          created_at INTEGER,
+          updated_at INTEGER
+        );
       ''')
-    
+    c.execute('''
+       CREATE TABLE playlist_song (
+          playlist_id INTEGER,
+          song_id INTEGER,
+          FOREIGN KEY (playlist_id) REFERENCES playlist(id),
+          FOREIGN KEY (song_id) REFERENCES song(id),
+          PRIMARY KEY (playlist_id, song_id)
+        );  
+    ''')
+
+def activity():
+    c.execute('''
+    CREATE TABLE activity (
+          id INTEGER PRIMARY KEY,
+          last_song_id INTEGER,
+          last_song_position INTEGER,
+          created_at INTEGER,
+          FOREIGN KEY (last_song_id) REFERENCES song(id)
+        );    
+    ''')
 
 
 def songs():
     c.execute('''
-          CREATE TABLE IF NOT EXISTS songs
-          ([id] TEXT PRIMARY KEY, [name] TEXT, [album_id] TEXT, [createdAt] INTEGER,
-          [location] TEXT)
+         CREATE TABLE song (
+        id INTEGER PRIMARY KEY,
+        title TEXT,
+        album TEXT,
+        artist TEXT,
+        duration INTEGER,
+        path TEXT,
+        created_at INTEGER,
+        updated_at INTEGER
+        );
           ''')
 
     

@@ -1,4 +1,4 @@
-from song import SongService
+from service.song import SongService
 
 
 
@@ -24,7 +24,7 @@ class PlaylistService:
                 self.current_song_index = 0
             else :   
                 self.songServiceObject.stop()
-        else : 
+        # else : 
         
             
         
@@ -73,4 +73,4 @@ class PlaylistService:
 #                 self.rewinding = False
 #             else:
 #                 pygame.mixer.music.unpause()
-#             pygame.time.wait(10)
+            # pygame.time.wait(10)
