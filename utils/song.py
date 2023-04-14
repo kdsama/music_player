@@ -163,3 +163,36 @@ def display_image(current_music_name):
     # Scale the image
     resized_image = pygame.transform.scale(image, (new_width, new_height))
     return resized_image
+
+# Advanced search (not only by the song name or artist but also by mood,genre,remixes, etc.)
+def search(query):
+    global metadata
+    matching_items = []
+
+    for title in metadata['title']:
+        if query.lower() in title.lower():
+            matching_items.append(title)
+
+    for artist in metadata['artist']:
+        if query.lower() in artist.lower():
+            matching_items.append(artist)
+
+    for mood in metadata['mood']:
+        if query.lower() in mood.lower():
+            matching_items.append(mood)
+
+    for genre in metadata['genre']:
+        if query.lower() in genre.lower():
+            matching_items.append(genre)
+
+    for remixes in metadata['remixes']:
+        if query.lower() in remixes.lower():
+            matching_items.append(remixes)
+
+    return set(matching_items)
+
+# Update the query results displayed by the UI
+def on_search_text_changed(text):
+    results = search(text)
+    # list_widget.clear()
+    # list_widget.addItems(results)
