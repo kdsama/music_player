@@ -4,6 +4,12 @@ import pygame
 #Used for fast-forward and back-off
 change_time = 0
 
+#Sleep time
+sleep_time = 0
+
+#sleep time switch: 0 is off, 1 is on
+sleep_time_switch = 0
+
 metadata = {}
 
 def metaData(song_path):
@@ -107,3 +113,24 @@ def next_music(current_music_name):
     previous_music_index = (get_music_index(current_music_name) + 1) % len(metadata)
     previous_music = metadata['title'][previous_music_index]
     pygame.mixer.music.play(previous_music)
+
+# quit
+def quit():
+    stop()
+    pygame.quit()
+    exit()
+
+# Sleep timer
+def set_sleep_time(seconds):
+    global sleep_time
+    global sleep_time_switch
+    sleep_time = sleep_time + seconds
+    sleep_time_switch = 1
+
+# Check if sleep time has been reached
+def check_sleep_time():
+    global sleep_time
+    if (sleep_time > 0):
+        sleep_time = sleep_time - 0.1
+    if (sleep_time <= 0 and sleep_time_switch == 1):
+        quit()
