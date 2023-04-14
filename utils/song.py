@@ -150,3 +150,16 @@ def get_last_music():
         content = json.load(f)
         last_music_name = content["current_music"]
         play(last_music_name)
+
+# Display the album image
+def display_image(current_music_name):
+    global metadata
+    current_music_index = get_music_index(current_music_name)
+    current_music_image = metadata['album'][current_music_index]
+    image = pygame.image.load(current_music_image)
+    # Set the new width and height
+    new_width = 100
+    new_height = 100
+    # Scale the image
+    resized_image = pygame.transform.scale(image, (new_width, new_height))
+    return resized_image
