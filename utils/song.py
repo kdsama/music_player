@@ -131,6 +131,6 @@ def set_sleep_time(seconds):
 def check_sleep_time():
     global sleep_time
     if (sleep_time > 0):
-        sleep_time = sleep_time - 0.1
+        sleep_time = sleep_time - 1
     if (sleep_time <= 0 and sleep_time_switch == 1):
         quit()
