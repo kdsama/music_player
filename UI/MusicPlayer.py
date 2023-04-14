@@ -3,7 +3,7 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtCore import QUrl, Qt
 from UI.play import MusicPlayer
 from service.playlist import PlaylistService
-
+from db import song
 
 START = "Start"
 PAUSE = "Pause"
@@ -136,7 +136,8 @@ class MusicPlayerApp(QMainWindow):
             self.toggle_button.setText(PAUSE)
 
             
-
+    def toggleLoop(self):
+        self.playlist.toggleLoop()
     # def stop_music(self):
     #     self.music_player.quit()
 

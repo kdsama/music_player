@@ -71,6 +71,7 @@ def fast_forward(seconds):
     current_time = pygame.mixer.music.get_pos() / 1000
     new_time = current_time + change_time
     pygame.mixer.music.set_pos(new_time * 1000)
+    
 
 def wait_for_music_to_end():
         while pygame.mixer.music.get_busy():

@@ -2,41 +2,56 @@ import sqlite3
 import time
 
 # Connect to the database
-conn = sqlite3.connect('mydatabase.db')
-c = conn.cursor()
+conn = ""
+c = ""
+def ReturnConnection():
+    global conn,c
+    conn = sqlite3.connect('./music_db')
+    c = conn.cursor()
+    return conn 
 
+def Load():
+    print("To load the database")
 
 def song_exists(title, artist):
     query = "SELECT id FROM song WHERE title=? AND artist=?"
     c.execute(query, (title, artist))
     result = c.fetchone()
+    conn.commit()
     return result is not None
 
 
 def add_song(title, album, artist, duration, path):
+    print(title,album,artist,duration,path)
     query = "INSERT INTO song (title, album, artist, duration, path) VALUES (?, ?, ?, ?, ?)"
     c.execute(query, (title, album, artist, duration, path))
+    conn.commit()
     return c.lastrowid
 
 
 def add_activity(song_id, position):
+    print("Adding activity")
     query = "INSERT INTO activity (last_song_id, last_song_position) VALUES (?, ?)"
     c.execute(query, (song_id, position))
+    conn.commit()
 
 def CheckOrInsertSong(metadata):
     SongExists = song_exists(metadata["title"],metadata["artist"])
-    if SongExists is None : 
+    print("Song exists",SongExists)
+    if not SongExists : 
         song_id = add_song(metadata["title"], metadata["album"], metadata["artist"], metadata["duration"], metadata["path"])
         add_activity(song_id, 0)  
     else:
         song_id = SongExists[0]      
         add_activity(song_id, 0)
+    conn.commit()
 
 def get_last_played_song():
     # Query to join the song and activity tables on song id
     query = "SELECT song.*, activity.last_song_position FROM song JOIN activity ON song.id = activity.last_song_id ORDER BY activity.id DESC LIMIT 1"
     c.execute(query)
     result = c.fetchone()
+    conn.commit()
     if result is None:
         # No song has been played yet, return None
         return None
@@ -57,6 +72,7 @@ def get_last_n_played_songs(n, skip):
     query = "SELECT song.*, activity.last_song_position FROM song JOIN activity ON song.id = activity.last_song_id ORDER BY activity.id DESC LIMIT ? OFFSET ?"
     c.execute(query, (n, skip))
     results = c.fetchall()
+    conn.commit()
     if results is None:
         # No songs have been played yet, return an empty list
         return []
@@ -81,6 +97,7 @@ def get_n_songs_for_artist(artist, n):
     query = "SELECT * FROM song WHERE artist=? LIMIT ?"
     c.execute(query, (artist, n))
     results = c.fetchall()
+    conn.commit()
     if results is None:
         # No songs found for the given artist, return an empty list
         return []
@@ -106,6 +123,7 @@ def get_n_songs_for_album(album, n):
     query = "SELECT * FROM song WHERE album=? LIMIT ?"
     c.execute(query, (album, n))
     results = c.fetchall()
+    conn.commit()
     if results is None:
         # No songs found for the given album, return an empty list
         return []
@@ -131,6 +149,7 @@ def get_n_songs_for_artist_played_less_than(artist, n, times_played):
     query = "SELECT song.*, activity.last_song_position, COUNT(activity.last_song_id) as play_count FROM song LEFT JOIN activity ON song.id = activity.last_song_id WHERE song.artist=? GROUP BY song.id HAVING play_count < ? ORDER BY play_count ASC LIMIT ?"
     c.execute(query, (artist, times_played, n))
     results = c.fetchall()
+    conn.commit()
     if results is None:
         # No songs found for the given artist, return an empty list
         return []
@@ -165,6 +184,7 @@ def get_n_songs_played_the_most(n):
         ORDER BY plays DESC
     """, (n,))
     results = c.fetchall()
+    conn.commit()
     if results is None:
         # No songs found for the given artist, return an empty list
         return []
@@ -192,5 +212,5 @@ def get_n_songs_played_the_most(n):
 
 
 # Commit the changes and close the connection
-conn.commit()
-conn.close()
+
+

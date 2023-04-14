@@ -14,37 +14,42 @@ class PlaylistService:
     def addToPlaylist(self,song):
         # If song is already present, remove it from the playlist and queue it.
         pos = -1 
-        for i in self.songs :
+        for i in range(0,len(self.songs)):
             if self.songs[i] == song :
-                pos = i 
+                pos = i
         if pos != -1 :
-            print("what about here ???")
             del self.songs[i]
             self.songs.append(song)
         else:
+            # Added to playlist. 
             self.songs.append(song)
 
 
+    def showCurrentPlaylist(self):
+        # This is incorrect . Here We have to fetch the names of the songs and just dislpay them , alongside how much time 
+        # What is returned is a array of object . each Object is {"name":"NameOfTheSong","duration":"12:30"}
 
+        return self.songs
         
         
     def play(self,index):
         if index != -1 :
             self.songServiceObject = SongService(self.songs[index])
         for song in self.songs : 
-            self.songServiceObject = SongService(song)
-            print("Or here ???")
+            self.songServiceObject = SongService(song)            
             self.songServiceObject.play()
 
     def next(self):
         self.current_song_index +=1 
-        #If index goes above 
-        if self.current_song_index >= len(self.music_files):
+        
+        if self.current_song_index >= len(self.songs):
             if self.loop:
-                self.current_song_index = 0
+                self.current_song_index = 0                
             else :   
                 self.songServiceObject.stop()
-        # else : 
+                return 
+        self.play(self.current_song_index)
+    
     def previous(self):
         self.current_song_index -=1 
         #If index goes above 
@@ -55,7 +60,9 @@ class PlaylistService:
                 self.songServiceObject.stop()
         # else :         
         
-            
+    #  To toggle loop button . 
+    def toggleLoop(self):
+        self.loop = not self.loop        
         
 
 # class MusicPlayer:

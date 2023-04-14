@@ -13,11 +13,11 @@ pygame.mixer.init()
 class SongService:
     def __init__(self, path):
         # make sure the path is an absolute path, and not a relative path
-        metadata = SongFunction.metaData(path)        
-        self.title = metadata["title"]
-        self.album = metadata["album"]
-        self.artist = metadata["artist"]
-        self.duration = metadata["duration"]
+        self.metadata = SongFunction.metaData(path)        
+        self.title = self.metadata["title"]
+        self.album = self.metadata["album"]
+        self.artist = self.metadata["artist"]
+        self.duration = self.metadata["duration"]
         self.path = path
         self.pauseSong = False 
         # self.initialize =      
@@ -29,6 +29,11 @@ class SongService:
         # You may need to add more values to the constructor to run this. 
         # SongFunction.play(self.path)
         utils.song.play(self.path)
+        try :
+
+            CheckOrInsertSong(self.metadata)
+        except Exception as e : 
+            print(e)
         
         
      
@@ -49,12 +54,14 @@ class SongService:
 
     def go_back(self, n):
         # go back n seconds in the song
-        SongFunction.fast_backward(n)
+        SongFunction.fast_forward(-n)
         
+    def stop(self):
+        SongFunction.stop()
     
     def go_front(self, n):
         # go forward n seconds in the song
-        SongFunction.fast_backward(n)
+        SongFunction.fast_forward(n)
     
 
 # class MusicPlayer:

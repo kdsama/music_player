@@ -1,6 +1,6 @@
 import sqlite3
-from utils import hash 
-conn = sqlite3.connect('./db/music_db') 
+from db.song import ReturnConnection
+conn = ReturnConnection()
 c = conn.cursor()
 
 
@@ -15,7 +15,7 @@ def seeder():
 
 def playlists():
     c.execute('''
-        CREATE TABLE playlist (
+        CREATE TABLE IF NOT EXISTS playlist (
           id INTEGER PRIMARY KEY,
           name TEXT,
           created_at INTEGER,
@@ -23,7 +23,7 @@ def playlists():
         );
       ''')
     c.execute('''
-       CREATE TABLE playlist_song (
+       CREATE TABLE IF NOT EXISTS playlist_song (
           playlist_id INTEGER,
           song_id INTEGER,
           FOREIGN KEY (playlist_id) REFERENCES playlist(id),
@@ -34,7 +34,7 @@ def playlists():
 
 def activity():
     c.execute('''
-    CREATE TABLE activity (
+    CREATE TABLE IF NOT EXISTS activity (
           id INTEGER PRIMARY KEY,
           last_song_id INTEGER,
           last_song_position INTEGER,
@@ -46,7 +46,7 @@ def activity():
 
 def songs():
     c.execute('''
-         CREATE TABLE song (
+         CREATE TABLE IF NOT EXISTS song (
         id INTEGER PRIMARY KEY,
         title TEXT,
         album TEXT,

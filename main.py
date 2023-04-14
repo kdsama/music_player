@@ -4,9 +4,14 @@ from PyQt5.QtCore import QUrl, Qt
 from UI.MusicPlayer import MusicPlayerApp
 
 from service.song import SongService
+from jobs.seeder import seeder
+from db.song import Load
 
 
 if __name__ == '__main__':
+    seeder()
+    # Load the cursor for the db 
+    Load()
     app = QApplication([])
     window = MusicPlayerApp()
     window.show()
