@@ -19,7 +19,7 @@ class SongService:
         self.artist = metadata["artist"]
         self.duration = metadata["duration"]
         self.path = path
-        self.paused = False 
+        self.pauseSong = False 
         # self.initialize =      
         
 
@@ -29,7 +29,7 @@ class SongService:
         # You may need to add more values to the constructor to run this. 
         # SongFunction.play(self.path)
         utils.song.play(self.path)
-        self.wait(int(self.duration))
+        
         
      
     def wait(self,n):
@@ -40,12 +40,12 @@ class SongService:
     def pause(self):
         # pause the song
         SongFunction.pause()
-        self.pause = True 
+        self.pauseSong = True 
     
     def resume(self):
         # resume the song 
         SongFunction.resume()
-        self.pause = False 
+        self.pauseSong = False 
 
     def go_back(self, n):
         # go back n seconds in the song

@@ -11,10 +11,30 @@ class PlaylistService:
         self.loop = False 
         self.songServiceObject  = None
     
-    def play(self):
+    def addToPlaylist(self,song):
+        # If song is already present, remove it from the playlist and queue it.
+        pos = -1 
+        for i in self.songs :
+            if self.songs[i] == song :
+                pos = i 
+        if pos != -1 :
+            print("what about here ???")
+            del self.songs[i]
+            self.songs.append(song)
+        else:
+            self.songs.append(song)
+
+
+
+        
+        
+    def play(self,index):
+        if index != -1 :
+            self.songServiceObject = SongService(self.songs[index])
         for song in self.songs : 
             self.songServiceObject = SongService(song)
-            song.play()
+            print("Or here ???")
+            self.songServiceObject.play()
 
     def next(self):
         self.current_song_index +=1 
@@ -25,6 +45,15 @@ class PlaylistService:
             else :   
                 self.songServiceObject.stop()
         # else : 
+    def previous(self):
+        self.current_song_index -=1 
+        #If index goes above 
+        if self.current_song_index < 0:
+            if self.loop:
+                self.current_song_index = len(self.songs) - 1
+            else :   
+                self.songServiceObject.stop()
+        # else :         
         
             
         
