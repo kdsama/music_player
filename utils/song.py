@@ -4,10 +4,11 @@ import pygame
 #Used for fast-forward and back-off
 change_time = 0
 
+metadata = {}
 
 def metaData(song_path):
     audio = MP3(song_path)
-    metadata = {}
+    global metadata
     ps = song_path.split("/")
     potential_song_item = ps[len(ps)-1]
     potential_song_name = potential_song_item
@@ -83,4 +84,26 @@ def back_off(seconds):
 def speed_up(rate):
     pygame.mixer.music.set_rate(rate * pygame.mixer.music.get_rate())
 
+#Get the index of the song
+def get_music_index(song_name):
+    global metadata
+    for i in range(0, len(metadata)):
+        if metadata[i] == song_name:
+            return i
+    else:
+        return 0
 
+# Previous Song
+def previous_music(current_music_name):
+    stop()
+    previous_music_index = (get_music_index(current_music_name) - 1) % len(metadata)
+    previous_music = metadata['title'][previous_music_index]
+    pygame.mixer.music.play(previous_music)
+
+
+# Next Song
+def next_music(current_music_name):
+    stop()
+    previous_music_index = (get_music_index(current_music_name) + 1) % len(metadata)
+    previous_music = metadata['title'][previous_music_index]
+    pygame.mixer.music.play(previous_music)
