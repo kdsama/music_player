@@ -1,5 +1,6 @@
 from mutagen.mp3 import MP3
 import pygame
+import json
 
 #Used for fast-forward and back-off
 change_time = 0
@@ -35,7 +36,8 @@ def load(song_path):
 
 def play(song_path):
     # pygame.mixer.init()
-    audio = load(song_path)    
+    audio = load(song_path)
+    save_current_music(song_path)  
     pygame.mixer.music.play()
     #The audio will not play without the wait below 
 
@@ -51,7 +53,7 @@ def stop():
 
 def waitAndKill(n):
     #wait for n seconds and stop the song , or whatever song that is being played. 
-    pygame.time.wait(n*1000)
+    wait(n)
     pygame.mixer.music.stop()
 
 def the_song_is_playing():
@@ -127,10 +129,24 @@ def set_sleep_time(seconds):
     sleep_time = sleep_time + seconds
     sleep_time_switch = 1
 
-# Check if sleep time has been reached
+# check the sleep time
 def check_sleep_time():
     global sleep_time
     if (sleep_time > 0):
         sleep_time = sleep_time - 1
     if (sleep_time <= 0 and sleep_time_switch == 1):
         quit()
+
+# Saves the name of the current music
+def save_current_music(current_music):
+    music_name = {"current_music": current_music}
+    with open("./current_music.json", "w") as f:
+        json.dump(music_name, f)
+
+
+# Show the last song playedwhen you left
+def get_last_music():
+    with open("./current_music.json", "r", encoding="utf-8") as f:
+        content = json.load(f)
+        last_music_name = content["current_music"]
+        play(last_music_name)
