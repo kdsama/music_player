@@ -1,7 +1,8 @@
 from mutagen.mp3 import MP3
 import pygame
 
-
+#Used for fast-forward and back-off
+change_time = 0
 
 
 def metaData(song_path):
@@ -56,8 +57,10 @@ def resume():
     pygame.mixer.music.unpause()
 
 def fast_forward(seconds):
+    global change_time
+    change_time += seconds
     current_time = pygame.mixer.music.get_pos() / 1000
-    new_time = current_time + seconds
+    new_time = current_time + change_time
     pygame.mixer.music.set_pos(new_time * 1000)
 
 def wait_for_music_to_end():
@@ -66,12 +69,14 @@ def wait_for_music_to_end():
             
             pygame.time.wait(10)   
 
-def fast_backward(seconds):
-    current_position = pygame.mixer.music.get_pos() // 1000
-    new_position = current_position - seconds
-    if new_position < 0:
-        new_position = 0
-    pygame.mixer.music.set_pos(new_position)
+def back_off(seconds):
+    global change_time
+    change_time -= seconds
+    current_time = pygame.mixer.music.get_pos() / 1000
+    new_time = current_time + change_time
+    if new_time < 0:
+        new_time = 0
+    pygame.mixer.music.set_pos(new_time * 1000)
     
 
 
