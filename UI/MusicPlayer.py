@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenuBar, QMenu, QAction, QFileDialog, QListWidget, QPushButton, QVBoxLayout, QWidget, QSlider, QLabel, QTextEdit
+from PyQt5.QtWidgets import QApplication, QMainWindow,QHBoxLayout, QSize,QMenuBar, QMenu, QAction, QFileDialog, QListWidget, QPushButton, QVBoxLayout, QWidget, QSlider, QLabel, QTextEdit
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtCore import QUrl, Qt
 from UI.play import MusicPlayer
@@ -68,18 +68,31 @@ class MusicPlayerApp(QMainWindow):
         add_volume_button.clicked.connect(self.add_volume)
 
         # Create speed control slider
-        speed_label = QLabel("Speed:", self)
-        speed_slider = QSlider(Qt.Horizontal, self)
-        speed_slider.setMinimum(50)
-        speed_slider.setMaximum(200)
-        speed_slider.setValue(100)
-        speed_slider.valueChanged.connect(self.change_speed)
+        position_label = QLabel("Position:", self)
+        position_slider = QSlider(Qt.Horizontal, self)
+        position_slider.setMinimum(0)
+        position_slider.setMaximum(200)
+        position_slider.setValue(0)
+        position_slider.valueChanged.connect(self.change_speed)
 
-        # Create lyrics area
-        lyrics_label = QLabel("Lyrics:", self)
-        self.lyrics_area = QTextEdit(self)
-        self.lyrics_area.setReadOnly(True)
+        # # Create lyrics area
+        # lyrics_label = QLabel("Lyrics:", self)
+        # self.lyrics_area = QTextEdit(self)
+        # self.lyrics_area.setReadOnly(True)
+        # Create music player list
+        self.music_list = QListWidget(self)
+        self.music_list.setWordWrap(True)
 
+        
+        self.dock.setWidget(self.music_list)
+
+        #layouts
+        Mainlayout = QVBoxLayout()
+        ButtonLayout = QHBoxLayout()
+        #sets the minsize of the mainwindow
+        self.setMinimumSize(QSize(100, 100))
+
+        # Update widget to pannel
         # Update widget to pannel
         layout = QVBoxLayout()
         layout.addWidget(self.music_list)
@@ -92,9 +105,9 @@ class MusicPlayerApp(QMainWindow):
         layout.addWidget(rewind_button)
         layout.addWidget(reduce_volume_button)
         layout.addWidget(add_volume_button)
-        layout.addWidget(speed_label)
-        layout.addWidget(speed_slider)
-        layout.addWidget(lyrics_label)
+        layout.addWidget(position_label)
+        layout.addWidget(position_slider)
+        # layout.addWidget(lyrics_label)
         layout.addWidget(self.lyrics_area)
 
         container = QWidget()

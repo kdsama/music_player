@@ -1,0 +1,58 @@
+QLabel {
+  color: #464d55;
+  font-weight: 600;
+}
+QPushButton {
+  background-color: #3C4048;
+  color: white;
+  font-weight: 600;
+  border-radius: 4px;
+  border: 1px solid #070707;
+  padding: 5px 15px;
+  margin-top: 10px;
+  outline: 20px;
+}
+QPushButton:hover {
+  background-color: #B2B2B2;
+  border: 3px solid black; /*#9ac3fe;*/
+}
+QMainWindow::separator {
+    background: #716C6C;
+    width: 5px; /* when vertical */
+    /*height: 1px; when horizontal */
+}
+QMainWindow {
+    background: #EAEAEA; 
+    width: 5px; /* when vertical */
+    /*height: 1px; when horizontal */
+}
+
+
+QDockWidget {
+    border: 1px solid black;
+    font-weight: 600; 
+    /*font-size: 1pt;*/
+    background: black;
+}
+QDockWidget::title {
+    /* text-align: left;  align the text to the left */
+    background: #EAEAEA;
+    margin-top: 10px;
+
+    padding-left: 1px;
+}
+
+QSlider::groove:horizontal {
+    border: 1px solid #999999;
+    height: 3px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
+    background: #5A5858;
+    margin: 2px 0;
+}
+
+QSlider::handle:horizontal {
+    background: #7F7F7F;
+    border: 1px solid #5c5c5c;
+    width: 18px;
+    margin: -5px 0;  /*handle is placed by default on the contents rect of the groove. Expand outside the groove */
+    border-radius: 3px;
+}
