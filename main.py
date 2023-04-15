@@ -1,11 +1,8 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenuBar, QMenu, QAction, QFileDialog, QListWidget, QPushButton, QVBoxLayout, QWidget, QSlider, QLabel, QTextEdit
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtCore import QUrl, Qt
+from PyQt5.QtWidgets import QApplication
 from UI.MusicPlayer import MusicPlayerApp
-
-from service.song import SongService
 from jobs.seeder import seeder
 from db.song import Load
+from pathlib import Path
 
 
 if __name__ == '__main__':
@@ -13,6 +10,7 @@ if __name__ == '__main__':
     # Load the cursor for the db 
     Load()
     app = QApplication([])
+    app.setStyleSheet(Path('UI/stylesheet.qss').read_text())
     window = MusicPlayerApp()
     window.show()
     app.exec_()    

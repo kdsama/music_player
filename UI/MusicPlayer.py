@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow,QHBoxLayout, QSize,QMenuBar, QMenu, QAction, QFileDialog, QListWidget, QPushButton, QVBoxLayout, QWidget, QSlider, QLabel, QTextEdit
+from PyQt5.QtWidgets import QApplication,QDockWidget, QMainWindow,QHBoxLayout, QMenuBar, QMenu, QAction, QFileDialog, QListWidget, QPushButton, QVBoxLayout, QWidget, QSlider, QLabel, QTextEdit
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtCore import QUrl, Qt
+from PyQt5.QtCore import QUrl, Qt,QSize
 from UI.play import MusicPlayer
 from service.playlist import PlaylistService
 from db import song
@@ -20,35 +20,31 @@ class MusicPlayerApp(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        
+        self.is_song_paused = False
+
+
         # Create window title
         self.setWindowTitle("Minimal Music Player")
-
+        
         # Create menu bar
         menu_bar = self.menuBar()
         file_menu = QMenu("File", self)
         menu_bar.addMenu(file_menu)
-        self.is_song_paused = False
+
+        
         # Add actions to menu
         open_action = QAction("Open", self)
         open_action.triggered.connect(self.open_music_file)
         file_menu.addAction(open_action)
 
-        # Create music player list
-        self.music_list = QListWidget(self)
 
         # Create play control buttons
-        # play_button = QPushButton("Load Library", self)
-        # play_button.clicked.connect(self.play_music)
-
-        self.toggle_button = QPushButton("TogglePlay", self)
-        
+        self.toggle_button = QPushButton("TogglePlay", self)        
         self.is_song_paused = False
         self.toggle_button.clicked.connect(self.toggle_music)
         self.toggle_button.setText(START)
-        
-        # stop_button = QPushButton("Stop", self)
-        # stop_button.clicked.connect(self.stop)
-
+                
         # Create next and previous buttons
         next_button = QPushButton("Next", self)
         next_button.clicked.connect(self.next_music)
@@ -75,14 +71,22 @@ class MusicPlayerApp(QMainWindow):
         position_slider.setValue(0)
         position_slider.valueChanged.connect(self.change_speed)
 
-        # # Create lyrics area
-        # lyrics_label = QLabel("Lyrics:", self)
-        # self.lyrics_area = QTextEdit(self)
-        # self.lyrics_area.setReadOnly(True)
+        # # # Create lyrics area
+        # # lyrics_label = QLabel("Lyrics:", self)
+        # # self.lyrics_area = QTextEdit(self)
+        # # self.lyrics_area.setReadOnly(True)
+        # # Create music player list
+        # self.music_list = QListWidget(self)
+        # self.music_list.setWordWrap(True)
+      # Create Playlist dock
+        self.dock = QDockWidget('PlayLists',self)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
+
         # Create music player list
         self.music_list = QListWidget(self)
         self.music_list.setWordWrap(True)
 
+        
         
         self.dock.setWidget(self.music_list)
 
@@ -90,28 +94,27 @@ class MusicPlayerApp(QMainWindow):
         Mainlayout = QVBoxLayout()
         ButtonLayout = QHBoxLayout()
         #sets the minsize of the mainwindow
-        self.setMinimumSize(QSize(100, 100))
+        self.setMinimumSize(QSize(50, 50))
 
         # Update widget to pannel
-        # Update widget to pannel
-        layout = QVBoxLayout()
-        layout.addWidget(self.music_list)
-        # layout.addWidget(play_button)  
-        layout.addWidget(self.toggle_button) 
-        # layout.addWidget(stop_button)  
-        layout.addWidget(next_button)
-        layout.addWidget(prev_button)
-        layout.addWidget(fast_button)
-        layout.addWidget(rewind_button)
-        layout.addWidget(reduce_volume_button)
-        layout.addWidget(add_volume_button)
-        layout.addWidget(position_label)
-        layout.addWidget(position_slider)
-        # layout.addWidget(lyrics_label)
-        layout.addWidget(self.lyrics_area)
+
+        Mainlayout.addWidget(position_label)
+        Mainlayout.addWidget(position_slider)
+        Mainlayout.addLayout(ButtonLayout)
+        #Mainlayout.addWidget(lyrics_label)
+        #Mainlayout.addWidget(self.lyrics_area)
+        ButtonLayout.addWidget(self.toggle_button)  
+        #ButtonLayout.addWidget(stop_button)  
+        ButtonLayout.addWidget(next_button)
+        ButtonLayout.addWidget(prev_button)
+        ButtonLayout.addWidget(fast_button)
+        ButtonLayout.addWidget(rewind_button)
+        ButtonLayout.addWidget(reduce_volume_button)
+        ButtonLayout.addWidget(add_volume_button)
+        
 
         container = QWidget()
-        container.setLayout(layout)
+        container.setLayout(Mainlayout)
         self.setCentralWidget(container)
 
         # Initialize media player
