@@ -63,7 +63,8 @@ class SongService:
         # go forward n seconds in the song
         SongFunction.fast_forward(n)
     
-
+    def get_song_position(self):
+        return SongFunction.get_song_position()
 # class MusicPlayer:
 #     def __init__(self, music_files):
 #         pygame.init()

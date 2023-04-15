@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication,QDockWidget, QMainWindow,QHBoxLayout, QMenuBar, QMenu, QAction, QFileDialog, QListWidget, QPushButton, QVBoxLayout, QWidget, QSlider, QLabel, QTextEdit
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtCore import QUrl, Qt,QSize
+from PyQt5.QtCore import QUrl, Qt,QSize, QTimer
 from UI.play import MusicPlayer
 from service.playlist import PlaylistService
 from db import song
@@ -44,7 +44,7 @@ class MusicPlayerApp(QMainWindow):
         self.is_song_paused = False
         self.toggle_button.clicked.connect(self.toggle_music)
         self.toggle_button.setText(START)
-                
+
         # Create next and previous buttons
         next_button = QPushButton("Next", self)
         next_button.clicked.connect(self.next_music)
@@ -65,11 +65,15 @@ class MusicPlayerApp(QMainWindow):
 
         # Create speed control slider
         position_label = QLabel("Position:", self)
-        position_slider = QSlider(Qt.Horizontal, self)
-        position_slider.setMinimum(0)
-        position_slider.setMaximum(200)
-        position_slider.setValue(0)
-        position_slider.valueChanged.connect(self.change_speed)
+        self.position_slider = QSlider(Qt.Horizontal, self)
+        self.position_slider.setMinimum(0)
+        
+        
+        self.position_slider.valueChanged.connect(self.update_song_position)
+        timer = QTimer()
+        timer.timeout.connect(self.update_slider)
+        timer.start(1000)
+
 
         # # # Create lyrics area
         # # lyrics_label = QLabel("Lyrics:", self)
@@ -99,7 +103,7 @@ class MusicPlayerApp(QMainWindow):
         # Update widget to pannel
 
         Mainlayout.addWidget(position_label)
-        Mainlayout.addWidget(position_slider)
+        Mainlayout.addWidget(self.position_slider)
         Mainlayout.addLayout(ButtonLayout)
         #Mainlayout.addWidget(lyrics_label)
         #Mainlayout.addWidget(self.lyrics_area)
@@ -133,8 +137,15 @@ class MusicPlayerApp(QMainWindow):
         if len(self.playlist.songs) == 1 :
             self.playlist.play(0)
             self.toggle_button.setText(PAUSE)
+        self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
         
+        
+    def update_slider(self):
+        print(self.playlist.songServiceObject.get_song_position())
+        self.position_slider.setValue(self.playlist.songServiceObject.get_song_position())
 
+    def update_song_position(self):
+        self.position_slider.setSliderPosition(self.position_slider.value())
 
     def play_music(self):
         pass

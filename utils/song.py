@@ -27,7 +27,13 @@ def metaData(song_path):
     return metadata
 
 
+def get_song_position():
     
+    pos = pygame.mixer.music.get_pos() / 1000
+    return pos
+
+
+
 
 def load(song_path):
     audio = MP3(song_path)
