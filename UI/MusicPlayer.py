@@ -23,7 +23,7 @@ class MusicPlayerApp(QMainWindow):
         
         self.is_song_paused = False
 
-
+        self.LastOpenedSong = True 
         # Create window title
         self.setWindowTitle("Minimal Music Player")
         
@@ -32,7 +32,8 @@ class MusicPlayerApp(QMainWindow):
         file_menu = QMenu("File", self)
         menu_bar.addMenu(file_menu)
 
-        
+        self.start_volume = 0.5
+        self.volume_change = 0.1
         # Add actions to menu
         open_action = QAction("Open", self)
         open_action.triggered.connect(self.open_music_file)
@@ -41,7 +42,6 @@ class MusicPlayerApp(QMainWindow):
 
         # Create play control buttons
         self.toggle_button = QPushButton("TogglePlay", self)        
-        self.is_song_paused = False
         self.toggle_button.clicked.connect(self.toggle_music)
         self.toggle_button.setText(START)
 
@@ -123,6 +123,12 @@ class MusicPlayerApp(QMainWindow):
 
         # Initialize media player
         self.playlist = PlaylistService([])
+        last_song = self.playlist.last_played_song() 
+        if last_song != "":
+            self.playlist.addToPlaylist(last_song)
+
+
+        self.set_volume()
         # self.music_player.get_music_list()
 
         # for music_path in self.music_player.get_music_list():
@@ -148,15 +154,22 @@ class MusicPlayerApp(QMainWindow):
         self.position_slider.setSliderPosition(self.position_slider.value())
 
     def play_music(self):
-        pass
+        self.playlist.play()
 
 # Depending on the nature pause and play the song . 
     def toggle_music(self):
         
         if not self.is_song_paused:
-            self.playlist.songServiceObject.pause()
-            self.is_song_paused = True 
-            self.toggle_button.setText(START)
+            if not self.LastOpenedSong :
+                print("We should come here now ")
+                self.playlist.songServiceObject.pause()
+                self.is_song_paused = True 
+                self.toggle_button.setText(START)
+            else:
+                print("but we are xoming hee")
+                self.LastOpenedSong = False
+                self.play_music()
+                self.toggle_button.setText(PAUSE)
         else:
             self.playlist.songServiceObject.resume()
             self.is_song_paused = False
@@ -183,12 +196,17 @@ class MusicPlayerApp(QMainWindow):
     def rewind(self):
         self.playlist.songServiceObject.go_back(10)
     
+    def set_volume(self):
+        self.start_volume = self.playlist.songServiceObject.increase_and_return_new_volume(self.start_volume,0.0)
+
     def reduce_volume(self):
-        pass
+        
+        self.start_volume = self.playlist.songServiceObject.decrease_and_return_new_volume(self.start_volume,self.volume_change)
         # self.music_player.volume_down()
 
     def add_volume(self):
-        pass
+        
+        self.start_volume = self.playlist.songServiceObject.increase_and_return_new_volume(self.start_volume,self.volume_change)
         # self.music_player.volume_up()
 
     def change_speed(self):

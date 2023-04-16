@@ -33,6 +33,18 @@ def get_song_position():
     return pos
 
 
+def setVolume(volume):
+    pygame.mixer.music.set_volume(volume)
+
+def increase_and_return_new_volume(from_volume,diff):
+    from_volume = min(from_volume+ diff,1.0)
+    setVolume(from_volume)
+    return from_volume
+
+def decrease_and_return_new_volume(from_volume,diff):
+    from_volume = max(from_volume- diff,0.0)
+    setVolume(from_volume)
+    return from_volume
 
 
 def load(song_path):

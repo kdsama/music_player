@@ -18,7 +18,9 @@ def song_exists(title, artist):
     c.execute(query, (title, artist))
     result = c.fetchone()
     conn.commit()
-    return result is not None
+    if result is not None : 
+        return result[0]
+    return False
 
 
 def add_song(title, album, artist, duration, path):
@@ -30,42 +32,47 @@ def add_song(title, album, artist, duration, path):
 
 
 def add_activity(song_id, position):
-    print("Adding activity")
     query = "INSERT INTO activity (last_song_id, last_song_position) VALUES (?, ?)"
     c.execute(query, (song_id, position))
     conn.commit()
 
 def CheckOrInsertSong(metadata):
     SongExists = song_exists(metadata["title"],metadata["artist"])
-    print("Song exists",SongExists)
+    
     if not SongExists : 
         song_id = add_song(metadata["title"], metadata["album"], metadata["artist"], metadata["duration"], metadata["path"])
+        
         add_activity(song_id, 0)  
     else:
-        song_id = SongExists[0]      
+        song_id = SongExists      
         add_activity(song_id, 0)
     conn.commit()
 
 def get_last_played_song():
     # Query to join the song and activity tables on song id
-    query = "SELECT song.*, activity.last_song_position FROM song JOIN activity ON song.id = activity.last_song_id ORDER BY activity.id DESC LIMIT 1"
-    c.execute(query)
-    result = c.fetchone()
-    conn.commit()
-    if result is None:
-        # No song has been played yet, return None
+    try:
+
+        query = "SELECT song.*, activity.last_song_position FROM song JOIN activity ON song.id = activity.last_song_id ORDER BY activity.id DESC LIMIT 1"
+        c.execute(query)
+        result = c.fetchone()
+        conn.commit()
+        if result is None:
+            # No song has been played yet, return None
+            return None
+        else:
+            # Return a dictionary with song information and last song position
+            return {
+                'title': result[1],
+                'album': result[2],
+                'artist': result[3],
+                'duration': result[4],
+                'path': result[5],
+                'last_position': result[6]
+
+            }   
+    except Exception as e : 
+        print("Unable to fetch the last song ::",e)
         return None
-    else:
-        # Return a dictionary with song information and last song position
-        return {
-            'title': result[1],
-            'album': result[2],
-            'artist': result[3],
-            'duration': result[4],
-            'path': result[5],
-            'last_position': result[6]
-            
-        }   
 
 def get_last_n_played_songs(n, skip):
     # Query to join the song and activity tables on song id

@@ -65,6 +65,11 @@ class SongService:
     
     def get_song_position(self):
         return SongFunction.get_song_position()
+    def increase_and_return_new_volume(self,from_vol,diff):
+        return SongFunction.increase_and_return_new_volume(from_vol,diff)
+    def decrease_and_return_new_volume(self,from_vol,diff):
+        return SongFunction.decrease_and_return_new_volume(from_vol,diff)
+
 # class MusicPlayer:
 #     def __init__(self, music_files):
 #         pygame.init()
