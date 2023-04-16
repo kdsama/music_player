@@ -54,7 +54,11 @@ class PlaylistService:
                 self.songServiceObject.stop()
                 return 
         self.play(self.current_song_index)
-    
+ 
+    def emptyCurrentPlaylist(self):
+        self.songs = []
+        return 
+ 
     def previous(self):
         self.current_song_index -=1 
         #If index goes above 

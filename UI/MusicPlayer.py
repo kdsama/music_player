@@ -35,8 +35,11 @@ class MusicPlayerApp(QMainWindow):
         self.start_volume = 0.5
         self.volume_change = 0.1
         # Add actions to menu
-        open_action = QAction("Open", self)
+        open_action = QAction("Open New Song", self)
         open_action.triggered.connect(self.open_music_file)
+        file_menu.addAction(open_action)
+        open_action = QAction("Add New Songs to Queue", self)
+        open_action.triggered.connect(self.queue_music_file)
         file_menu.addAction(open_action)
 
 
@@ -139,12 +142,22 @@ class MusicPlayerApp(QMainWindow):
         music_path, _ = QFileDialog.getOpenFileName(self, "Open the Music File", "", "MP3 (*.mp3);;All Files (*)")
         
         if music_path:
+            self.playlist.emptyCurrentPlaylist()
+            self.playlist.addToPlaylist(music_path)
+            
+            self.playlist.play(0)
+        self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
+    
+    def queue_music_file(self):
+        music_path, _ = QFileDialog.getOpenFileName(self, "Open the Music File", "", "MP3 (*.mp3);;All Files (*)")
+        
+        if music_path:
             self.playlist.addToPlaylist(music_path)
         if len(self.playlist.songs) == 1 :
             self.playlist.play(0)
             self.toggle_button.setText(PAUSE)
         self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
-        
+
         
     def update_slider(self):
         print(self.playlist.songServiceObject.get_song_position())
