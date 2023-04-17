@@ -147,7 +147,7 @@ class MusicPlayerApp(QMainWindow):
             self.playlist.addToPlaylist(music_path)
             
             self.play_music()
-        self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
+        # self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
     
     def queue_music_file(self):
         music_path, _ = QFileDialog.getOpenFileName(self, "Open the Music File", "", "MP3 (*.mp3);;All Files (*)")
@@ -157,7 +157,7 @@ class MusicPlayerApp(QMainWindow):
         if len(self.playlist.songs) == 1 :
             self.playlist.play(0)
             self.toggle_button.setText(PAUSE)
-        self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
+        # self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
 
         
     def update_slider(self):
