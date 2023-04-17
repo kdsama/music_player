@@ -34,10 +34,13 @@ class PlaylistService:
 
         return self.songs
         
-        
+    def get_playlist_length(self):
+        return len(self.songs)
+    
     def play(self,index=-1):
         if index != -1 :
             self.songServiceObject = SongService(self.songs[index])
+            song_id = self.songServiceObject.play()     
         for song in self.songs : 
             self.songServiceObject = SongService(song)            
             song_id = self.songServiceObject.play()
@@ -70,7 +73,7 @@ class PlaylistService:
             else :   
                 self.songServiceObject.stop()
         else : 
-            self.play(self.current_song_index)
+            self.play()
 
 
         self.play(self.current_song_index)

@@ -146,7 +146,7 @@ class MusicPlayerApp(QMainWindow):
             self.playlist.emptyCurrentPlaylist()
             self.playlist.addToPlaylist(music_path)
             
-            self.playlist.play(0)
+            self.play_music()
         self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
     
     def queue_music_file(self):
@@ -168,14 +168,17 @@ class MusicPlayerApp(QMainWindow):
         self.position_slider.setSliderPosition(self.position_slider.value())
 
     def play_music(self):
+
         self.playlist.play()
+        self.toggle_button.setText(PAUSE)
 
 # Depending on the nature pause and play the song . 
     def toggle_music(self):
-        
+        if self.playlist.get_playlist_length() == 0 :
+            print("We coming here ?")
+            return 
         if not self.is_song_paused:
             if not self.LastOpenedSong :
-                print("We should come here now ")
                 self.playlist.songServiceObject.pause()
                 self.is_song_paused = True 
                 self.toggle_button.setText(START)
@@ -183,7 +186,7 @@ class MusicPlayerApp(QMainWindow):
                 print("but we are xoming hee")
                 self.LastOpenedSong = False
                 self.play_music()
-                self.toggle_button.setText(PAUSE)
+                
         else:
             self.playlist.songServiceObject.resume()
             self.is_song_paused = False
