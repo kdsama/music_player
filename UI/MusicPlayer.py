@@ -138,6 +138,21 @@ class MusicPlayerApp(QMainWindow):
         # for music_path in self.music_player.get_music_list():
         #     self.music_list.addItem(music_path)
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Space:
+            self.toggle_music()
+        elif event.key() == Qt.Key_Left and event.modifiers() == Qt.ControlModifier:
+            self.reduce_volume()
+        elif event.key() == Qt.Key_Right and event.modifiers() == Qt.ControlModifier:
+            self.add_volume()
+        elif event.key() == Qt.Key_Left or event.key() == Qt.Key_A:
+            self.rewind()
+        elif event.key() == Qt.Key_Right or event.key() == Qt.Key_D:
+            self.fast_forward()
+        elif event.key() == Qt.Key_Up or event.key() == Qt.Key_W:
+            self.prev_music()
+        elif event.key() == Qt.Key_Down or event.key() == Qt.Key_S:
+            self.next_music()
 
     def open_music_file(self):
         music_path, _ = QFileDialog.getOpenFileName(self, "Open the Music File", "", "MP3 (*.mp3);;All Files (*)")
@@ -208,6 +223,7 @@ class MusicPlayerApp(QMainWindow):
         self.playlist.previous()
 
     def fast_forward(self):
+        print("we coming here or not for fastforward ???")
         self.playlist.songServiceObject.go_front(10)
 
     def rewind(self):
