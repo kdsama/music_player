@@ -38,7 +38,7 @@ def add_activity(song_id, position):
 
 def CheckOrInsertSong(metadata):
     SongExists = song_exists(metadata["title"],metadata["artist"])
-    
+    song_id = -1 
     if not SongExists : 
         song_id = add_song(metadata["title"], metadata["album"], metadata["artist"], metadata["duration"], metadata["path"])
         
@@ -46,7 +46,10 @@ def CheckOrInsertSong(metadata):
     else:
         song_id = SongExists      
         add_activity(song_id, 0)
+        
     conn.commit()
+    return song_id
+    
 
 def get_last_played_song():
     # Query to join the song and activity tables on song id

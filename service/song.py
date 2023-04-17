@@ -20,6 +20,7 @@ class SongService:
         self.duration = self.metadata["duration"]
         self.path = path
         self.pauseSong = False 
+        self.current_time = 0 
         # self.initialize =      
         
 
@@ -28,12 +29,15 @@ class SongService:
     def play(self): 
         # You may need to add more values to the constructor to run this. 
         # SongFunction.play(self.path)
-        utils.song.play(self.path)
+        SongFunction.play(self.path)
         try :
 
-            CheckOrInsertSong(self.metadata)
+            song_id = CheckOrInsertSong(self.metadata)
+            
+            return song_id 
         except Exception as e : 
             print(e)
+            return -1 
         
         
      
@@ -54,20 +58,24 @@ class SongService:
 
     def go_back(self, n):
         # go back n seconds in the song
-        SongFunction.fast_forward(-n)
+        self.current_time -= n 
+        SongFunction.fast_forward(self.current_time)
         
     def stop(self):
         SongFunction.stop()
     
     def go_front(self, n):
         # go forward n seconds in the song
-        SongFunction.fast_forward(n)
+        self.current_time += n 
+        SongFunction.fast_forward(self.current_time)
     
     def get_song_position(self):
         return SongFunction.get_song_position()
-    def increase_and_return_new_volume(self,from_vol,diff):
+    @staticmethod
+    def increase_and_return_new_volume(from_vol,diff):
         return SongFunction.increase_and_return_new_volume(from_vol,diff)
-    def decrease_and_return_new_volume(self,from_vol,diff):
+    @staticmethod
+    def decrease_and_return_new_volume(from_vol,diff):
         return SongFunction.decrease_and_return_new_volume(from_vol,diff)
 
 # class MusicPlayer:

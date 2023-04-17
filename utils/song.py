@@ -83,12 +83,11 @@ def pause():
 def resume():
     pygame.mixer.music.unpause()
 
-def fast_forward(seconds):
-    global change_time
-    change_time += seconds
-    current_time = pygame.mixer.music.get_pos() / 1000
-    new_time = current_time + change_time
-    pygame.mixer.music.set_pos(new_time * 1000)
+def fast_forward(current_time=0):
+
+    
+    new_time = pygame.mixer.music.get_pos()/1000 +  current_time 
+    pygame.mixer.music.set_pos(new_time)
     
 
 def wait_for_music_to_end():
@@ -97,14 +96,7 @@ def wait_for_music_to_end():
             
             pygame.time.wait(10)   
 
-def back_off(seconds):
-    global change_time
-    change_time -= seconds
-    current_time = pygame.mixer.music.get_pos() / 1000
-    new_time = current_time + change_time
-    if new_time < 0:
-        new_time = 0
-    pygame.mixer.music.set_pos(new_time * 1000)
+
     
 
 

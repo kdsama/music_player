@@ -3,6 +3,7 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtCore import QUrl, Qt,QSize, QTimer
 from UI.play import MusicPlayer
 from service.playlist import PlaylistService
+from service.song import SongService
 from db import song
 
 START = "Start"
@@ -210,11 +211,11 @@ class MusicPlayerApp(QMainWindow):
         self.playlist.songServiceObject.go_back(10)
     
     def set_volume(self):
-        self.start_volume = self.playlist.songServiceObject.increase_and_return_new_volume(self.start_volume,0.0)
+        self.start_volume = SongService.increase_and_return_new_volume(self.start_volume,0.0)
 
     def reduce_volume(self):
         
-        self.start_volume = self.playlist.songServiceObject.decrease_and_return_new_volume(self.start_volume,self.volume_change)
+        self.start_volume = SongService.decrease_and_return_new_volume(self.start_volume,self.volume_change)
         # self.music_player.volume_down()
 
     def add_volume(self):

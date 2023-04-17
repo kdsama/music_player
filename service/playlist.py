@@ -1,5 +1,4 @@
 from service.song import SongService
-from utils import song as SongFunction
 from db.song import get_last_played_song
 
 
@@ -10,12 +9,11 @@ class PlaylistService:
         self.current_song_index = 0 
         # songs =  list of absolute paths, not relative paths 
         self.songs = songs 
-        self.loop = False 
+        self.loop = True 
         self.songServiceObject  = None
     
     def addToPlaylist(self,song):
         # If song is already present, remove it from the playlist and queue it.
-        print(song)
         pos = -1 
         for i in range(0,len(self.songs)):
             if self.songs[i] == song :
@@ -42,9 +40,10 @@ class PlaylistService:
             self.songServiceObject = SongService(self.songs[index])
         for song in self.songs : 
             self.songServiceObject = SongService(song)            
-            self.songServiceObject.play()
+            song_id = self.songServiceObject.play()
 
     def next(self):
+        
         self.current_song_index +=1 
         
         if self.current_song_index >= len(self.songs):
@@ -53,6 +52,7 @@ class PlaylistService:
             else :   
                 self.songServiceObject.stop()
                 return 
+                   
         self.play(self.current_song_index)
  
     def emptyCurrentPlaylist(self):
@@ -60,13 +60,21 @@ class PlaylistService:
         return 
  
     def previous(self):
+        print(self.current_song_index) 
         self.current_song_index -=1 
         #If index goes above 
         if self.current_song_index < 0:
             if self.loop:
                 self.current_song_index = len(self.songs) - 1
+                self.play(self.current_song_index)
             else :   
                 self.songServiceObject.stop()
+        else : 
+            self.play(self.current_song_index)
+
+
+        self.play(self.current_song_index)
+
         # else :         
         
     #  To toggle loop button . 
