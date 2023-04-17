@@ -54,7 +54,8 @@ def load(song_path):
 
 def play(song_path):
     # pygame.mixer.init()
-    audio = load(song_path)
+    load(song_path)
+    print("Song path loaded now is ",song_path)
     save_current_music(song_path)  
     pygame.mixer.music.play()
     #The audio will not play without the wait below 
