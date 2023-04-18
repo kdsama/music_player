@@ -166,6 +166,7 @@ class MusicPlayerApp(QMainWindow):
         last_song = self.playlist.last_played_song() 
         if last_song != "":
             self.playlist.addToPlaylist(last_song)
+            self.refresh_playlist()
 
 
         self.set_volume()
@@ -174,6 +175,22 @@ class MusicPlayerApp(QMainWindow):
         # for music_path in self.music_player.get_music_list():
         #     self.music_list.addItem(music_path)
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Space:
+            self.toggle_music()
+        elif event.key() == Qt.Key_Left and event.modifiers() == Qt.ControlModifier:
+            self.reduce_volume()
+        elif event.key() == Qt.Key_Right and event.modifiers() == Qt.ControlModifier:
+            self.add_volume()
+        elif event.key() == Qt.Key_Left or event.key() == Qt.Key_A:
+            self.rewind()
+        elif event.key() == Qt.Key_Right or event.key() == Qt.Key_D:
+            self.fast_forward()
+        elif event.key() == Qt.Key_Up or event.key() == Qt.Key_W:
+            self.prev_music()
+        elif event.key() == Qt.Key_Down or event.key() == Qt.Key_S:
+            self.next_music()
+
 
     def open_music_file(self):
         music_path, _ = QFileDialog.getOpenFileName(self, "Open the Music File", "", "MP3 (*.mp3);;All Files (*)")
@@ -181,10 +198,13 @@ class MusicPlayerApp(QMainWindow):
         if music_path:
             self.playlist.emptyCurrentPlaylist()
             self.playlist.addToPlaylist(music_path)
+
             # clear dock element-list
-            self.music_list.clear()
-            self.music_list.addItems(self.playlist.songs)
+            #self.music_list.clear()
+            #self.music_list.addItems(self.playlist.songs)
+
             self.play_music()
+            self.refresh_playlist() 
         # self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
     
     def queue_music_file(self):
@@ -192,13 +212,14 @@ class MusicPlayerApp(QMainWindow):
         
         if music_path:
             self.playlist.addToPlaylist(music_path)
-            self.music_list.clear()
-            self.music_list.addItems(self.playlist.songs)
+            #self.music_list.clear()
+            #self.music_list.addItems(self.playlist.songs)
         if len(self.playlist.songs) == 1 :
             self.playlist.play(0)
             #self.toggle_button.setText(PAUSE)
             self.toggle_button.setIcon(QIcon('UI/images/Pause.png'))
             self.toggle_button.setToolTip("Pause song")
+        self.refresh_playlist()
         # self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
 
         
@@ -219,8 +240,8 @@ class MusicPlayerApp(QMainWindow):
 # Depending on the nature pause and play the song . 
     def toggle_music(self):
 
-        self.music_list.clear()
-        self.music_list.addItems(self.playlist.songs)
+        #self.music_list.clear()
+        #self.music_list.addItems(self.playlist.songs)
 
         if self.playlist.get_playlist_length() == 0 :
             print("We coming here ?")
@@ -259,6 +280,7 @@ class MusicPlayerApp(QMainWindow):
         self.playlist.previous()
 
     def fast_forward(self):
+        print("we coming here or not for fastforward ???")
         self.playlist.songServiceObject.go_front(10)
 
     def rewind(self):
@@ -308,6 +330,15 @@ class MusicPlayerApp(QMainWindow):
         print(name)
         self.song_name.setText(name)
 
+        self.playlist.play_song_by_pathurl(name)
 
-
+    def refresh_playlist(self):
+        self.music_list.clear()
+        print("Are we going to add to the playlist ???")
+        try :
+            song_name_list = SongService.get_song_names_from_pathurls(self.playlist.songs)
+            print(song_name_list)
+            self.music_list.addItems(song_name_list)
+        except Exception as e : 
+            self.music_list.addItems(self.playlist.songs)
     
