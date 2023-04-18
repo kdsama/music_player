@@ -23,7 +23,7 @@ class MusicPlayerApp(QMainWindow):
 
         
         self.is_song_paused = False
-
+        self.song_name = QLabel("Song Name")
         self.LastOpenedSong = True 
         # Create window title
         self.setWindowTitle("Minimal Music Player")
@@ -78,7 +78,16 @@ class MusicPlayerApp(QMainWindow):
         timer.timeout.connect(self.update_slider)
         timer.start(1000)
 
+        self.dock = QDockWidget('PlayLists',self)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
 
+        # Create music player list
+        self.music_list = QListWidget(self)
+        self.music_list.setWordWrap(True)
+        self.music_list.itemClicked.connect(self.play_song_and_set_song_name)
+
+
+        self.dock.setWidget(self.music_list)
         # # # Create lyrics area
         # # lyrics_label = QLabel("Lyrics:", self)
         # # self.lyrics_area = QTextEdit(self)
@@ -87,8 +96,7 @@ class MusicPlayerApp(QMainWindow):
         # self.music_list = QListWidget(self)
         # self.music_list.setWordWrap(True)
       # Create Playlist dock
-        self.dock = QDockWidget('PlayLists',self)
-        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
+
 
         # Create music player list
         self.music_list = QListWidget(self)
@@ -105,7 +113,7 @@ class MusicPlayerApp(QMainWindow):
         self.setMinimumSize(QSize(50, 50))
 
         # Update widget to pannel
-
+        # Mainlayout.addWidget(self.song_name, 0, 0,1,8)
         Mainlayout.addWidget(position_label)
         Mainlayout.addWidget(self.position_slider)
         Mainlayout.addLayout(ButtonLayout)
@@ -130,6 +138,7 @@ class MusicPlayerApp(QMainWindow):
         last_song = self.playlist.last_played_song() 
         if last_song != "":
             self.playlist.addToPlaylist(last_song)
+            self.refresh_playlist()
 
 
         self.set_volume()
@@ -162,6 +171,7 @@ class MusicPlayerApp(QMainWindow):
             self.playlist.addToPlaylist(music_path)
             
             self.play_music()
+            self.refresh_playlist()            
         # self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
     
     def queue_music_file(self):
@@ -172,6 +182,7 @@ class MusicPlayerApp(QMainWindow):
         if len(self.playlist.songs) == 1 :
             self.playlist.play(0)
             self.toggle_button.setText(PAUSE)
+        self.refresh_playlist()
         # self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
 
         
@@ -246,7 +257,21 @@ class MusicPlayerApp(QMainWindow):
         pass
 
 
+    def play_song_and_set_song_name(self):
+
+        #play song
+        name = self.music_list.currentItem().text()        
+        self.song_name.setText(name)
+
+        self.playlist.play_song_by_pathurl(name)
 
 
-
-    
+    def refresh_playlist(self):
+        self.music_list.clear()
+        print("Are we going to add to the playlist ???")
+        try :
+            song_name_list = SongService.get_song_names_from_pathurls(self.playlist.songs)
+            print(song_name_list)
+            self.music_list.addItems(song_name_list)
+        except Exception as e : 
+            self.music_list.addItems(self.playlist.songs)
