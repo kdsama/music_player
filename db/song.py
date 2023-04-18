@@ -50,6 +50,29 @@ def CheckOrInsertSong(metadata):
     conn.commit()
     return song_id
     
+def get_all_songs():
+    # Query to join the song and activity tables on song id
+
+    query = "SELECT * from song"
+    results = c.fetchall()
+    conn.commit()
+    if results is None:
+        # No songs have been played yet, return an empty list
+        return []
+    else:
+        # Return a list of dictionaries with song information and last song position
+        songs = []
+        for result in results:
+            song = {
+                'title': result[1],
+                'album': result[2],
+                'artist': result[3],
+                'duration': result[4],
+                'path': result[5],
+                'last_position': result[6]
+            }
+            songs.append(song)
+        return songs
 
 def get_last_played_song():
     # Query to join the song and activity tables on song id
@@ -222,5 +245,4 @@ def get_n_songs_played_the_most(n):
 
 
 # Commit the changes and close the connection
-
 
