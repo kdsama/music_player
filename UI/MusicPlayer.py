@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import QApplication,QDockWidget, QMainWindow,QHBoxLayout, QMenuBar, QMenu, QAction, QFileDialog, QListWidget, QPushButton, QVBoxLayout, QWidget, QSlider, QLabel, QTextEdit
+from PyQt5.QtWidgets import QApplication,QDockWidget, QMainWindow,QHBoxLayout,QGridLayout, QMenuBar, QMenu, QAction, QFileDialog, QListWidget, QPushButton, QVBoxLayout, QWidget, QSlider, QLabel, QTextEdit
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtCore import QUrl, Qt,QSize, QTimer
+from PyQt5.QtGui import QPixmap, QIcon
 from UI.play import MusicPlayer
 from service.playlist import PlaylistService
 from service.song import SongService
@@ -15,13 +16,24 @@ def GetPlayisSongPausedText(isSongPaused):
             return START
         return PAUSE
 
+class SliderWindow(QWidget):
+    def __init__(self,parent=None):
+        super(SliderWindow,self).__init__(parent)
 
+        layout = QVBoxLayout()
+        self.slider = QSlider(Qt.Horizontal)
+        layout.addWidget(self.slider)
+        self.setLayout(layout)
+
+class Volume(QPushButton):
+    def __init__(self,parent=None):
+        super(Volume,self).__init__(parent)
 
 class MusicPlayerApp(QMainWindow):
     def __init__(self):
-        super().__init__()
+        super(MusicPlayerApp,self).__init__()
 
-        
+        self.slider = None
         self.is_song_paused = False
 
         self.LastOpenedSong = True 
@@ -43,31 +55,57 @@ class MusicPlayerApp(QMainWindow):
         open_action.triggered.connect(self.queue_music_file)
         file_menu.addAction(open_action)
 
+         # Create label for song name
+        self.song_name = QLabel("Song Name")
 
         # Create play control buttons
-        self.toggle_button = QPushButton("TogglePlay", self)        
+        self.toggle_button = QPushButton("")        
         self.toggle_button.clicked.connect(self.toggle_music)
-        self.toggle_button.setText(START)
+        self.toggle_button.setIcon(QIcon('UI/images/Play.png'))
+        self.toggle_button.setToolTip("Play song")
 
         # Create next and previous buttons
-        next_button = QPushButton("Next", self)
+        next_button = QPushButton("", self)
+        next_button.setIcon(QIcon('UI/images/next.png'))
+        next_button.setToolTip("Play next song")
         next_button.clicked.connect(self.next_music)
-        prev_button = QPushButton("Previous", self)
+
+        prev_button = QPushButton("", self)
+        prev_button.setIcon(QIcon('UI/images/previous.png'))
+        prev_button.setToolTip("Play previous song")
         prev_button.clicked.connect(self.prev_music)
 
         # Create fast forward and rewind buttons
-        fast_button = QPushButton("fast forward", self)
+        fast_button = QPushButton("", self)
+        fast_button.setIcon(QIcon('UI/images/fast_forward.png'))
+        fast_button.setToolTip("Fast forward")
         fast_button.clicked.connect(self.fast_forward)
-        rewind_button = QPushButton("rewind", self)
+        rewind_button = QPushButton("", self)
+        rewind_button.setIcon(QIcon('UI/images/rewind.png'))
+        rewind_button.setToolTip("Rewind")
         rewind_button.clicked.connect(self.rewind)
 
         # Create reduce volume and add volume buttons
-        reduce_volume_button = QPushButton("reduce volume", self)
+        reduce_volume_button = Volume(self)
+        reduce_volume_button.setIcon(QIcon('UI/images/volume_down.png'))
+        reduce_volume_button.setToolTip("Reduce volume")
         reduce_volume_button.clicked.connect(self.reduce_volume)
-        add_volume_button = QPushButton("add volume", self)
+
+        add_volume_button = QPushButton("", self)
+        add_volume_button.setIcon(QIcon('UI/images/volume_high.png'))
+        add_volume_button.setToolTip("Increase volume")
         add_volume_button.clicked.connect(self.add_volume)
 
-        # Create speed control slider
+        # Create loop button
+        self.loop_button = QPushButton("")
+        self.loop_button.setIcon(QIcon('UI/images/repeat.png'))
+        self.loop_button.setToolTip("Loop playlist")
+        self.loop_button.setCheckable(True)
+        self.loop_button.clicked.connect(self.call_loop_function)
+
+
+
+        # Create position control slider
         position_label = QLabel("Position:", self)
         self.position_slider = QSlider(Qt.Horizontal, self)
         self.position_slider.setMinimum(0)
@@ -85,7 +123,8 @@ class MusicPlayerApp(QMainWindow):
         # # self.lyrics_area.setReadOnly(True)
         # # Create music player list
         # self.music_list = QListWidget(self)
-        # self.music_list.setWordWrap(True)
+
+
       # Create Playlist dock
         self.dock = QDockWidget('PlayLists',self)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
@@ -93,36 +132,33 @@ class MusicPlayerApp(QMainWindow):
         # Create music player list
         self.music_list = QListWidget(self)
         self.music_list.setWordWrap(True)
+        self.music_list.itemClicked.connect(self.play_song_and_set_song_name)
+        
 
-        
-        
         self.dock.setWidget(self.music_list)
 
         #layouts
-        Mainlayout = QVBoxLayout()
-        ButtonLayout = QHBoxLayout()
+        self.Mainlayout = QGridLayout()
+        self.Mainlayout.addWidget(self.song_name, 0, 0,1,8)
+        self.Mainlayout.addWidget(position_label, 1, 0,1,8)
+        self.Mainlayout.addWidget(self.position_slider, 2, 0,1,8)
+        self.Mainlayout.addWidget(QWidget(), 3, 0,1,8)
+        self.Mainlayout.addWidget(self.toggle_button, 4, 0)
+        self.Mainlayout.addWidget(next_button, 4, 1)
+        self.Mainlayout.addWidget(prev_button, 4, 2)
+        self.Mainlayout.addWidget(fast_button, 4, 3)
+        self.Mainlayout.addWidget(rewind_button, 4, 4)
+        self.Mainlayout.addWidget(reduce_volume_button, 4, 5)
+        self.Mainlayout.addWidget(add_volume_button, 4, 6)
+        self.Mainlayout.addWidget(self.loop_button, 4, 7)
+
+
         #sets the minsize of the mainwindow
-        self.setMinimumSize(QSize(50, 50))
-
-        # Update widget to pannel
-
-        Mainlayout.addWidget(position_label)
-        Mainlayout.addWidget(self.position_slider)
-        Mainlayout.addLayout(ButtonLayout)
-        #Mainlayout.addWidget(lyrics_label)
-        #Mainlayout.addWidget(self.lyrics_area)
-        ButtonLayout.addWidget(self.toggle_button)  
-        #ButtonLayout.addWidget(stop_button)  
-        ButtonLayout.addWidget(next_button)
-        ButtonLayout.addWidget(prev_button)
-        ButtonLayout.addWidget(fast_button)
-        ButtonLayout.addWidget(rewind_button)
-        ButtonLayout.addWidget(reduce_volume_button)
-        ButtonLayout.addWidget(add_volume_button)
+        self.setMinimumSize(QSize(100, 100))
         
 
         container = QWidget()
-        container.setLayout(Mainlayout)
+        container.setLayout(self.Mainlayout)
         self.setCentralWidget(container)
 
         # Initialize media player
@@ -145,7 +181,9 @@ class MusicPlayerApp(QMainWindow):
         if music_path:
             self.playlist.emptyCurrentPlaylist()
             self.playlist.addToPlaylist(music_path)
-            
+            # clear dock element-list
+            self.music_list.clear()
+            self.music_list.addItems(self.playlist.songs)
             self.play_music()
         # self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
     
@@ -154,9 +192,13 @@ class MusicPlayerApp(QMainWindow):
         
         if music_path:
             self.playlist.addToPlaylist(music_path)
+            self.music_list.clear()
+            self.music_list.addItems(self.playlist.songs)
         if len(self.playlist.songs) == 1 :
             self.playlist.play(0)
-            self.toggle_button.setText(PAUSE)
+            #self.toggle_button.setText(PAUSE)
+            self.toggle_button.setIcon(QIcon('UI/images/Pause.png'))
+            self.toggle_button.setToolTip("Pause song")
         # self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
 
         
@@ -170,10 +212,16 @@ class MusicPlayerApp(QMainWindow):
     def play_music(self):
 
         self.playlist.play()
-        self.toggle_button.setText(PAUSE)
+        #self.toggle_button.setText(PAUSE)
+        self.toggle_button.setIcon(QIcon('UI/images/Pause.png'))
+        self.toggle_button.setToolTip("Pause song")
 
 # Depending on the nature pause and play the song . 
     def toggle_music(self):
+
+        self.music_list.clear()
+        self.music_list.addItems(self.playlist.songs)
+
         if self.playlist.get_playlist_length() == 0 :
             print("We coming here ?")
             return 
@@ -181,7 +229,9 @@ class MusicPlayerApp(QMainWindow):
             if not self.LastOpenedSong :
                 self.playlist.songServiceObject.pause()
                 self.is_song_paused = True 
-                self.toggle_button.setText(START)
+                #self.toggle_button.setText(START)
+                self.toggle_button.setIcon(QIcon('UI/images/Play.png'))
+                self.toggle_button.setToolTip("Play song")
             else:
                 print("but we are xoming hee")
                 self.LastOpenedSong = False
@@ -190,8 +240,9 @@ class MusicPlayerApp(QMainWindow):
         else:
             self.playlist.songServiceObject.resume()
             self.is_song_paused = False
-            self.toggle_button.setText(PAUSE)
-
+            #self.toggle_button.setText(PAUSE)
+            self.toggle_button.setIcon(QIcon('UI/images/Pause.png'))
+            self.toggle_button.setToolTip("Pause song")
             
     def toggleLoop(self):
         self.playlist.toggleLoop()
@@ -229,7 +280,33 @@ class MusicPlayerApp(QMainWindow):
     def change_speed(self):
         pass
 
+    def call_loop_function(self):
+        if self.loop_button.isChecked():
+            self.loop_button.setStyleSheet("background-color: white;border: 3px solid black;")
+            self.toggleLoop()
+        else:
+            self.loop_button.setStyleSheet("background-color: white;color: black;font-weight: 600;border-radius: 4px;border: 1px solid #070707;padding: 5px 15px;margin-top: 10px;outline: 20px;")
+    
+    # Function to add slider to volume button
+    #def slider_window(self):
+    #    if self.slider is None:
+    #        self.slider = SliderWindow(self) 
+    #        #self.slider.setGeometry(100,200,640,480)
+    #        self.Mainlayout.addWidget(self.slider,3,5,1,3)
+    #        self.slider.show()
+    #    else:
+    #        self.slider.close()
+    #        self.slider = None
 
+    #Function to play the selected song and set song name label
+    def play_song_and_set_song_name(self):
+
+        #play song
+
+        #sets Qlabel with selected song
+        name = self.music_list.currentItem().text()
+        print(name)
+        self.song_name.setText(name)
 
 
 
