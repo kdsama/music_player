@@ -62,7 +62,7 @@ class SongService:
         try :
 
             song_id = CheckOrInsertSong(self.metadata)
-            
+            path_name_metadata[self.path] = self.metadata
             return song_id 
         except Exception as e : 
             print(e)
