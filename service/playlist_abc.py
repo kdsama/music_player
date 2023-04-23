@@ -9,6 +9,10 @@ class PlaylistServiceABC(ABC):
     @abstractmethod
     def play_song_by_pathurl(self, path_url):
         pass
+
+    @abstractmethod
+    def play_song_by_name(self,name):
+        pass
     
     @abstractmethod
     def showCurrentPlaylist(self):

@@ -164,7 +164,7 @@ class MusicPlayerApp(QMainWindow):
         # Create music player list
         self.music_list = QListWidget(self)
         self.music_list.setWordWrap(True)
-        self.music_list.itemClicked.connect(self.play_song_and_set_song_name)
+        self.music_list.itemDoubleClicked.connect(self.play_song_and_set_song_name)
 
 
         # Create search bar
@@ -367,14 +367,12 @@ class MusicPlayerApp(QMainWindow):
 
         #sets Qlabel with selected song
         name = self.music_list.currentItem().text()
-        print(name)
         self.song_name.setText(name)
-
-        self.playlist.play_song_by_pathurl(name)
+        # self.playlist.play_song_by_pathurl(name)
+        self.playlist.play_song_by_name(name)
 
     def refresh_playlist(self):
         self.music_list.clear()
-        print("Are we going to add to the playlist ???==> refresh playlist",self.playlist.songs)
         try :
             song_name_list = SongService.get_song_names_from_pathurls(self.playlist.songs)
             print(song_name_list)

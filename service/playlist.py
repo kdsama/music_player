@@ -12,6 +12,7 @@ class PlaylistService(PlaylistServiceABC):
         self.songs = songs 
         self.loop = False 
         self.songServiceObject  = None
+        
     
     def addToPlaylist(self,song):
         # If song is already present, remove it from the playlist and queue it.
@@ -25,7 +26,7 @@ class PlaylistService(PlaylistServiceABC):
         else:
             # Added to playlist. 
             self.songs.append(song)
-        print(self.songs)
+        
         if len(self.songs) == 1 :
             self.songServiceObject = SongService(self.songs[0])
 
@@ -33,8 +34,19 @@ class PlaylistService(PlaylistServiceABC):
         for index in range(0,len(self.songs)) :
             if self.songs[index] == path_url :
                 self.songServiceObject = SongService(self.songs[index])
-                song_id = self.songServiceObject.play()     
+                song_id = self.songServiceObject.play()    
 
+    def play_song_by_name(self,name):
+       path = SongService.get_song_path_by_name(name)
+
+       for index in range(0,len(self.songs)) :
+           if path == self.songs[index]:
+                print(path,self.songs[index])
+                self.songServiceObject = SongService(self.songs[index])
+                song_id = self.songServiceObject.play()   
+               
+               
+            
     def showCurrentPlaylist(self):
         # This is incorrect . Here We have to fetch the names of the songs and just dislpay them , alongside how much time 
         # What is returned is a array of object . each Object is {"name":"NameOfTheSong","duration":"12:30"}

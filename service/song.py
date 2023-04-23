@@ -10,7 +10,17 @@ pygame.mixer.init()
 # we will fetch the information about the song once it has been selected from the music player. 
 # the path can be anyone. 
 path_name_metadata = {}
+song_name_metadata= {}
 
+def set_existing_song_metadata():
+        global path_name_metadata
+        songs_list = get_all_songs()
+        
+        for songs in songs_list:
+            
+            path_name_metadata[songs["path"]] = songs 
+            song_name_metadata[songs["title"]] = songs 
+        print(songs_list)
 
 class SongService:
     def __init__(self, path):
@@ -23,17 +33,11 @@ class SongService:
         self.path = path
         self.pauseSong = False 
         self.current_time = 0 
-        # self.initialize =     
-        self.set_existing_song_metadata()
-         
+        set_existing_song_metadata()
         
 
     
-    def set_existing_song_metadata(self):
-        songs_list = get_all_songs()
-        for songs in songs_list:
-            path_name_metadata[songs.path] = songs 
-        
+
 
     @staticmethod
     def get_song_names_from_pathurls(paths): 
@@ -58,22 +62,7 @@ class SongService:
         return name 
 
     
-    def set_existing_song_metadata(self):
-        songs_list = get_all_songs()
-        for songs in songs_list:
-            path_name_metadata[songs.path] = songs 
-        
 
-    @staticmethod
-    def get_song_names_from_pathurls(paths): 
-        name_list = []
-        for path in paths : 
-            try :
-
-                name_list.append(SongService.get_song_names_from_pathurl(path))
-            except Exception as e : 
-                name_list.append("Name Not Found")
-        return name_list
 
     @staticmethod
     def get_song_names_from_pathurl(path):
@@ -94,14 +83,12 @@ class SongService:
 
             song_id = CheckOrInsertSong(self.metadata)
             path_name_metadata[self.path] = self.metadata
-            path_name_metadata[self.path] = self.metadata
+            song_name_metadata[self.title] = self.metadata
             return song_id 
         except Exception as e : 
             print(e)
             return -1 
-        
-        
-     
+
     def wait(self,n):
         # This is a testing function 
         
@@ -138,3 +125,10 @@ class SongService:
     @staticmethod
     def decrease_and_return_new_volume(from_vol,diff):
         return SongFunction.decrease_and_return_new_volume(from_vol,diff)
+    @staticmethod    
+    def get_song_path_by_name(title):
+        global song_name_metadata
+        
+        
+        return song_name_metadata[title]["path"]
+         

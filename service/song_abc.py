@@ -46,3 +46,15 @@ class SongServiceBase(ABC):
     @abstractmethod
     def decrease_and_return_new_volume(from_vol, diff):
         pass
+    
+    @staticmethod
+    @abstractmethod
+    def get_songs_from_names(names): 
+        pass
+    
+    @staticmethod    
+    @abstractmethod
+    def get_song_path_by_name(title):
+        pass
+        
+     
