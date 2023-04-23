@@ -9,7 +9,7 @@ class PlaylistService:
         self.current_song_index = 0 
         # songs =  list of absolute paths, not relative paths 
         self.songs = songs 
-        self.loop = True 
+        self.loop = False 
         self.songServiceObject  = None
     
     def addToPlaylist(self,song):
@@ -50,14 +50,15 @@ class PlaylistService:
     def get_playlist_length(self):
         return len(self.songs)
     
-    def play(self,index=-1):
-        print("Index and song about to be played",index,self.songs[index])
-        if index != -1 :
+    def play(self,index=-2):
+        
+        if index != -2 :
+
             self.songServiceObject = SongService(self.songs[index])
             song_id = self.songServiceObject.play()     
             return 
-        for song in self.songs : 
-            print("Here is some issue right ??")
+        
+        for song in self.songs :             
             self.songServiceObject = SongService(song)            
             song_id = self.songServiceObject.play()
 
@@ -69,6 +70,7 @@ class PlaylistService:
             if self.loop:
                 self.current_song_index = 0                
             else :   
+                self.current_song_index = len(self.songs) -1 
                 self.songServiceObject.stop()
                 return 
                    
@@ -99,7 +101,9 @@ class PlaylistService:
         
     #  To toggle loop button . 
     def toggleLoop(self):
-        self.loop = not self.loop     
+        self.loop = not self.loop  
+        print("Value of loop is ",self.loop)
+        print(self.loop)   
 
     def last_played_song(self):
         song =  get_last_played_song()

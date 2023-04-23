@@ -197,8 +197,8 @@ class MusicPlayerApp(QMainWindow):
         self.Mainlayout.addWidget(self.position_slider, 4, 0,1,11)
         self.Mainlayout.addWidget(QWidget(), 2, 0,1,9)
         self.Mainlayout.addWidget(self.toggle_button, 1, 4)
-        self.Mainlayout.addWidget(prev_button, 1, 6)
-        self.Mainlayout.addWidget(next_button, 1, 5)
+        self.Mainlayout.addWidget(prev_button, 1, 5)
+        self.Mainlayout.addWidget(next_button, 1, 6)
         #self.Mainlayout.addWidget(fast_button, 1, 7)
         #self.Mainlayout.addWidget(rewind_button, 1, 8)
         self.Mainlayout.addWidget(reduce_volume_button, 1, 7)
@@ -356,6 +356,7 @@ class MusicPlayerApp(QMainWindow):
             self.toggleLoop()
         else:
             self.loop_button.setStyleSheet("border: 1px solid #070707;background-color: #B2B2B2")
+            self.toggleLoop()
     
 
 
