@@ -74,8 +74,9 @@ class PlaylistService(PlaylistServiceABC):
                 self.current_song_index = 0                
             else :   
                 self.current_song_index = len(self.songs) -1 
-                self.songServiceObject.stop()
-                return 
+                # self.songServiceObject.stop()
+                
+                
                    
         self.play(self.current_song_index)
  
@@ -86,7 +87,7 @@ class PlaylistService(PlaylistServiceABC):
     def previous(self):
         
         self.current_song_index -=1 
-        print(self.current_song_index)
+        
         #If index goes above 
         if self.current_song_index < 0:
             if self.loop:
@@ -94,8 +95,10 @@ class PlaylistService(PlaylistServiceABC):
                 self.play(self.current_song_index)
             else :   
                 self.current_song_index = 0 
-                self.songServiceObject.stop()
-                return
+                # self.play(self.current_song_index)
+                # self.songServiceObject.stop()
+                # raise  Exception("set slider to 0 ")
+                # return
 
 
         self.play(self.current_song_index)

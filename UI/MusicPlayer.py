@@ -241,9 +241,16 @@ class MusicPlayerApp(QMainWindow):
         elif event.key() == Qt.Key_Right or event.key() == Qt.Key_D:
             self.fast_forward()
         elif event.key() == Qt.Key_Up or event.key() == Qt.Key_W:
-            self.prev_music()
+            try : 
+                self.prev_music()
+            except Exception as e : 
+                self.reset_controls_on_edge_songs()
         elif event.key() == Qt.Key_Down or event.key() == Qt.Key_S:
-            self.next_music()
+            try : 
+                self.next_music()
+            except Exception as e : 
+                self.reset_controls_on_edge_songs()
+            
 
 
     def open_music_file(self):
@@ -288,9 +295,20 @@ class MusicPlayerApp(QMainWindow):
     def update_slider(self):
         # print(self.playlist.songServiceObject.get_song_position())
         
+        song_position = self.playlist.songServiceObject.get_song_position()
+        self.position_slider.setValue(song_position)
         
-        self.position_slider.setValue(self.playlist.songServiceObject.get_song_position())
-        self.sliderPos = self.playlist.songServiceObject.get_song_position()
+        duration = self.playlist.songServiceObject.duration
+        if self.sliderPos - duration < 20 and self.sliderPos  >= song_position:
+            try :
+                self.next_music()
+            except Exception as e : 
+                # Means no next song probably 
+                self.reset_controls_on_edge_songs()
+        else : 
+            
+            self.sliderPos = song_position
+        
         # self.change_song_check()        
 
     def update_song_position(self):
@@ -303,13 +321,12 @@ class MusicPlayerApp(QMainWindow):
             self.fast_forward(int(new_pos-self.sliderPos))
         else : 
             self.rewind(int(self.sliderPos-new_pos))
-
         self.timer.start(1000)
 
     def play_music(self):
-
         self.playlist.play()
         #self.toggle_button.setText(PAUSE)
+        self.refresh_slider_info()
         self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
         self.toggle_button.setToolTip("Pause song")
 
@@ -344,9 +361,6 @@ class MusicPlayerApp(QMainWindow):
         self.playlist.toggleLoop()
 
 
-    def update_lyrics(self, lyrics):
-        pass
-
     # Set the title name of the song. Whenever you select a song , you are shown which current song is being played.
     def set_player_title(self,name=""):
         if name == "":
@@ -355,13 +369,13 @@ class MusicPlayerApp(QMainWindow):
         else : 
             self.song_name.setText(name)
 
-    def refresh_image(self):
-        
-        pixmap = QPixmap('UI/img/'+str(random.randInt(1,12)))
-        #pixmap4 = pixmap.scaled(64, 64, Qt.KeepAspectRatio)
+    def refresh_image(self):        
+        pixmap = QPixmap('UI/img/'+str(random.randint(1,12)))
         self.Image.setPixmap(pixmap)
+        
     def refresh_slider_info(self):
         self.refresh_image()
+        self.sliderPos = 0 
         self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
         self.position_slider.setMinimum(0)
         self.position_slider.setValue(0)
@@ -499,7 +513,17 @@ class MusicPlayerApp(QMainWindow):
             self.next_time_check = False
         else:
             self.next_time_check = False
-            self.next_music()
+            try : 
+                self.next_music()
+            except Exception as e : 
+                self.reset_controls_on_edge_songs()
+
+
+    # If we reach at the end of the songs 
+    def reset_controls_on_edge_songs(self):
+        self.position_slider.setValue(0)
+        self.timer.stop()
+        # self.toggle_music()
 
     def prev_button_pressed(self):
         self.tp.start(1000)
@@ -510,7 +534,11 @@ class MusicPlayerApp(QMainWindow):
             self.prev_time_check = False
         else:
             self.prev_time_check = False
-            self.prev_music()
+            try : 
+                self.prev_music()
+            except Exception as e : 
+                # Means we are at first or last song 
+                self.reset_controls_on_edge_songs()
 
 
 

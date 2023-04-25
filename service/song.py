@@ -138,4 +138,4 @@ class SongService:
     @staticmethod
     def the_song_is_playing():
         return SongFunction.the_song_is_playing()
-         
+    
