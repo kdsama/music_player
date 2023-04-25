@@ -5,6 +5,8 @@ from PyQt5.QtGui import QPixmap, QIcon,QPainter,QBrush,QColor
 from UI.play import MusicPlayer
 from service.playlist import PlaylistService
 from service.song import SongService
+from UI.components.volume import Volume
+from UI.components.help import Help
 from db import song
 import os
 START = "Start"
@@ -12,28 +14,8 @@ PAUSE = "Pause"
 ONE_HOUR_IN_MILISECONDS = 3600000
 HALF_HOUR_IN_MILISECONDS = 1800000
 
-def GetPlayisSongPausedText(isSongPaused):
-        if isSongPaused :
-            return START
-        return PAUSE
-
-class Help(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        self.setWindowTitle("Shortcut Keys")
-        self.label = QLabel()
-        self.label.setObjectName('Help_label')
-        layout = QVBoxLayout()
-        self.label.setText("Play or Pause \t-  Space bar \n\nReduce Volume \t-  Ctrl + Left key \n\nAdd Volume \t-  Ctrl + Right key \n\nRewind \t\t-  A or Left Key \n\nFast forward \t-  D or Right key \n\nPlay previous song \t-  W or Up key \n\nPlay next song \t-  S or Down key")
-        layout.addWidget(self.label)
-        self.setLayout(layout)
 
 
-
-class Volume(QPushButton):
-    def __init__(self,parent=None):
-        super(Volume,self).__init__(parent)
 
 class MusicPlayerApp(QMainWindow):
     def __init__(self):
@@ -78,7 +60,7 @@ class MusicPlayerApp(QMainWindow):
         # Create song image
         self.Image = QLabel(self)
         self.Image.setFixedSize(QSize(200,200))
-        pixmap = QPixmap('UI/pic.png')
+        pixmap = QPixmap('UI/img/pic.png')
         #pixmap4 = pixmap.scaled(64, 64, Qt.KeepAspectRatio)
         self.Image.setPixmap(pixmap)
         
@@ -86,21 +68,21 @@ class MusicPlayerApp(QMainWindow):
         # Create play control buttons
         self.toggle_button = QPushButton("")        
         self.toggle_button.clicked.connect(self.toggle_music)
-        self.toggle_button.setIcon(QIcon('UI/Play.png'))
+        self.toggle_button.setIcon(QIcon('UI/img/Play.png'))
         self.toggle_button.setToolTip("Play song")
         self.toggle_button.setFixedSize(QSize(60,60))
 
         # Create next and previous buttons
         next_button = QPushButton("", self)
         next_button.setObjectName('next_button')
-        next_button.setIcon(QIcon('UI/next.png'))
+        next_button.setIcon(QIcon('UI/img/next.png'))
         next_button.setToolTip("click to play next song / hold to fast forward")
         next_button.pressed.connect(self.next_button_pressed)
         next_button.released.connect(self.next_button_released)
         next_button.setFixedSize(QSize(60,60))
 
         prev_button = QPushButton("", self)
-        prev_button.setIcon(QIcon('UI/previous.png'))
+        prev_button.setIcon(QIcon('UI/img/previous.png'))
         prev_button.setToolTip("Click to play previous song / hold to rewind")
         prev_button.pressed.connect(self.prev_button_pressed)
         prev_button.released.connect(self.prev_button_released)
@@ -110,13 +92,13 @@ class MusicPlayerApp(QMainWindow):
         '''
         # Create fast forward and rewind buttons
         fast_button = QPushButton("", self)
-        fast_button.setIcon(QIcon('UI/images/fast_forward.png'))
+        fast_button.setIcon(QIcon('UI/img/images/fast_forward.png'))
         fast_button.setToolTip("Fast forward")
         fast_button.clicked.connect(self.fast_forward)
         fast_button.setFixedSize(QSize(60,60))
 
         rewind_button = QPushButton("", self)
-        rewind_button.setIcon(QIcon('UI/images/rewind.png'))
+        rewind_button.setIcon(QIcon('UI/img/images/rewind.png'))
         rewind_button.setToolTip("Rewind")
         rewind_button.clicked.connect(self.rewind)
         rewind_button.setFixedSize(QSize(60,60))
@@ -124,13 +106,13 @@ class MusicPlayerApp(QMainWindow):
 
         # Create reduce volume and add volume buttons
         reduce_volume_button = Volume(self)
-        reduce_volume_button.setIcon(QIcon('UI/volume_down.png'))
+        reduce_volume_button.setIcon(QIcon('UI/img/volume_down.png'))
         reduce_volume_button.setToolTip("Reduce volume")
         reduce_volume_button.clicked.connect(self.reduce_volume)
         reduce_volume_button.setFixedSize(QSize(60,60))
 
         add_volume_button = QPushButton("", self)
-        add_volume_button.setIcon(QIcon('UI/volume_high.png'))
+        add_volume_button.setIcon(QIcon('UI/img/volume_high.png'))
         add_volume_button.setToolTip("Increase volume")
         add_volume_button.clicked.connect(self.add_volume)
         add_volume_button.setFixedSize(QSize(60,60))
@@ -142,7 +124,7 @@ class MusicPlayerApp(QMainWindow):
 
         # Create loop button
         self.loop_button = QPushButton("")
-        self.loop_button.setIcon(QIcon('UI/repeat.png'))
+        self.loop_button.setIcon(QIcon('UI/img/repeat.png'))
         self.loop_button.setToolTip("Loop playlist")
         self.loop_button.setCheckable(True)
         self.loop_button.clicked.connect(self.call_loop_function)
@@ -150,7 +132,7 @@ class MusicPlayerApp(QMainWindow):
 
         # Create Timer button
         self.timer_button = QPushButton("")
-        self.timer_button.setIcon(QIcon('UI/timer.png'))
+        self.timer_button.setIcon(QIcon('UI/img/timer.png'))
         self.timer_button.setText('No Timer')
         self.timer_button.setToolTip("No timer set")
         self.timer_button.setObjectName('timer_button')
@@ -286,7 +268,7 @@ class MusicPlayerApp(QMainWindow):
         if len(self.playlist.songs) == 1 :
             self.playlist.play(0)
             #self.toggle_button.setText(PAUSE)
-            self.toggle_button.setIcon(QIcon('UI/Pause.png'))
+            self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
             self.toggle_button.setToolTip("Pause song")
         self.refresh_playlist()
         # self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
@@ -332,7 +314,7 @@ class MusicPlayerApp(QMainWindow):
 
         self.playlist.play()
         #self.toggle_button.setText(PAUSE)
-        self.toggle_button.setIcon(QIcon('UI/Pause.png'))
+        self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
         self.toggle_button.setToolTip("Pause song")
 
 # Depending on the nature pause and play the song . 
@@ -348,7 +330,7 @@ class MusicPlayerApp(QMainWindow):
                 self.playlist.songServiceObject.pause()
                 self.is_song_paused = True 
                 #self.toggle_button.setText(START)
-                self.toggle_button.setIcon(QIcon('UI/Play.png'))
+                self.toggle_button.setIcon(QIcon('UI/img/Play.png'))
                 self.toggle_button.setToolTip("Play song")
             else:
                 
@@ -359,7 +341,7 @@ class MusicPlayerApp(QMainWindow):
             self.playlist.songServiceObject.resume()
             self.is_song_paused = False
             #self.toggle_button.setText(PAUSE)
-            self.toggle_button.setIcon(QIcon('UI/Pause.png'))
+            self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
             self.toggle_button.setToolTip("Pause song")
             
     def toggleLoop(self):
@@ -424,7 +406,7 @@ class MusicPlayerApp(QMainWindow):
         #self.playlist.songServiceObject.resume()
         self.is_song_paused = False
         self.LastOpenedSong = False
-        self.toggle_button.setIcon(QIcon('UI/Pause.png'))
+        self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
         self.toggle_button.setToolTip("Pause song")
 
 
@@ -432,8 +414,6 @@ class MusicPlayerApp(QMainWindow):
         self.music_list.clear()
         try :
             song_name_list = SongService.get_song_names_from_pathurls(self.playlist.songs)
-            
-
             self.music_list.addItems(song_name_list)
         except Exception as e : 
             self.music_list.addItems(self.playlist.songs)
@@ -510,6 +490,9 @@ class MusicPlayerApp(QMainWindow):
         else:
             self.prev_time_check = False
             self.prev_music()
+
+
+
 
 
 
