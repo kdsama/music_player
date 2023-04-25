@@ -18,7 +18,7 @@ def set_existing_song_metadata():
             
             path_name_metadata[songs["path"]] = songs 
             song_name_metadata[songs["title"]] = songs 
-        print(songs_list)
+        
 
 class SongService:
     def __init__(self, path):
@@ -106,7 +106,12 @@ class SongService:
         # go back n seconds in the song
         self.current_time -= n 
         SongFunction.fast_forward(self.current_time)
-        
+    
+    def move_song_to_position(self,position):
+        self.current_time = position - self.get_song_position()
+        print(self.current_time)
+        SongFunction.fast_forward(self.current_time)
+            
     def stop(self):
         SongFunction.stop()
     
@@ -116,7 +121,8 @@ class SongService:
         SongFunction.fast_forward(self.current_time)
     
     def get_song_position(self):
-        return SongFunction.get_song_position()
+        # self.current_time = SongFunction.get_song_position()
+        return self.current_time + SongFunction.get_song_position()
     @staticmethod
     def increase_and_return_new_volume(from_vol,diff):
         return SongFunction.increase_and_return_new_volume(from_vol,diff)
@@ -126,7 +132,10 @@ class SongService:
     @staticmethod    
     def get_song_path_by_name(title):
         global song_name_metadata
-        
+    
         
         return song_name_metadata[title]["path"]
+    @staticmethod
+    def the_song_is_playing():
+        return SongFunction.the_song_is_playing()
          

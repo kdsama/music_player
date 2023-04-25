@@ -6,10 +6,11 @@ from UI.play import MusicPlayer
 from service.playlist import PlaylistService
 from service.song import SongService
 from db import song
-
+import os
 START = "Start"
 PAUSE = "Pause"
-
+ONE_HOUR_IN_MILISECONDS = 3600000
+HALF_HOUR_IN_MILISECONDS = 1800000
 
 def GetPlayisSongPausedText(isSongPaused):
         if isSongPaused :
@@ -43,7 +44,8 @@ class MusicPlayerApp(QMainWindow):
         self.is_song_paused = False
         self.next_time_check = False
         self.prev_time_check = False
-
+        
+        self.sliderPos = 0 
         self.LastOpenedSong = True 
         # Create window title
         self.setWindowTitle("Minimal Music Player")
@@ -164,7 +166,6 @@ class MusicPlayerApp(QMainWindow):
         self.position_slider.sliderReleased.connect(self.update_song_position)
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_slider)
-        
 
 
         # # # Create lyrics area
@@ -190,7 +191,7 @@ class MusicPlayerApp(QMainWindow):
 
         #set place holder text for search bar
         self.SearchBar.setPlaceholderText("Search here...")
-
+        # self.SearchBar.keyPressEvent
         #self.dock_layout = QVBoxLayout()
         self.dock.setTitleBarWidget(self.SearchBar)
         self.dummy_widget = QWidget()
@@ -251,6 +252,9 @@ class MusicPlayerApp(QMainWindow):
         self.song_name.setText(name.text())
 
         self.set_volume()
+        self.sleep_timer = QTimer()
+        self.sleep_timer.timeout.connect(self.closeEvent)
+                
 
 
     def keyPressEvent(self, event):
@@ -310,18 +314,19 @@ class MusicPlayerApp(QMainWindow):
         pass
 
     def update_slider(self):
-        print(self.playlist.songServiceObject.get_song_position())
-        self.position_slider.setValue(self.playlist.songServiceObject.get_song_position())
-
+        # print(self.playlist.songServiceObject.get_song_position())
+        
+        self.sliderPos+=1
+        self.position_slider.setValue(self.sliderPos)
+        # self.change_song_check()        
 
     def update_song_position(self):
         self.timer.stop()
-
-        slider_position_value = self.position_slider.value()
-
-        # set song relative to the position
-
-
+        print(self.position_slider.value(),"this is the value ")
+        self.move_song_to_position(self.position_slider.value())
+        self.position_slider.setValue(self.position_slider.value())    
+        self.sliderPos = self.position_slider.value() 
+        
         self.timer.start(1000)
 
     def play_music(self):
@@ -337,7 +342,7 @@ class MusicPlayerApp(QMainWindow):
 
         self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
         if self.playlist.get_playlist_length() == 0 :
-            print("We coming here ?")
+            
             return 
         if not self.is_song_paused:
             if not self.LastOpenedSong :
@@ -347,7 +352,7 @@ class MusicPlayerApp(QMainWindow):
                 self.toggle_button.setIcon(QIcon('UI/Play.png'))
                 self.toggle_button.setToolTip("Play song")
             else:
-                print("but we are xoming hee")
+                
                 self.LastOpenedSong = False
                 self.play_music()
                 
@@ -371,9 +376,11 @@ class MusicPlayerApp(QMainWindow):
     def prev_music(self):
         self.playlist.previous()
 
+    def move_song_to_position(self,slider_pos):
+        self.playlist.songServiceObject.move_song_to_position(slider_pos)
+
     def fast_forward(self):
         self.next_time_check = True
-        print("we coming here or not for fastforward ???")
         self.playlist.songServiceObject.go_front(10)
 
     def rewind(self):
@@ -426,34 +433,56 @@ class MusicPlayerApp(QMainWindow):
         self.music_list.clear()
         try :
             song_name_list = SongService.get_song_names_from_pathurls(self.playlist.songs)
-            print(song_name_list)
+            
+
             self.music_list.addItems(song_name_list)
         except Exception as e : 
             self.music_list.addItems(self.playlist.songs)
 
 
     def call_timer_function(self):
+        time_to_sleep_in_seconds = 0
         if self.timer_button_count == 0:
             self.timer_button.setToolTip("Pause after 30 minutes")
             self.timer_button.setStyleSheet("border: 3px solid #00ABB3;background-color: #EAEAEA;")
-            self.timer_button.setText('30 minutes')
+            self.timer_button.setText('30 minutes ')
             self.timer_button.setFixedSize(QSize(150,60))
             self.timer_button_count = 1
+            time_to_sleep_in_seconds = HALF_HOUR_IN_MILISECONDS
+            self.sleep_timer.start(time_to_sleep_in_seconds*1000)
             #self.toggleTimer()
 
         elif self.timer_button_count == 1:
             self.timer_button.setToolTip("Pause after 1 hour")
             self.timer_button.setStyleSheet("border: 3px solid #00ABB3;background-color: #EAEAEA;")            
-            self.timer_button.setText('1 hour')
+            self.timer_button.setText('1 hour ')
             self.timer_button.setFixedSize(QSize(150,60))
             self.timer_button_count = 2
-
+            time_to_sleep_in_seconds = ONE_HOUR_IN_MILISECONDS
+            self.sleep_timer.start(time_to_sleep_in_seconds)
+        
         elif self.timer_button_count == 2:
+            self.timer_button.setToolTip("Pause after 1 hour")
+            self.timer_button.setStyleSheet("border: 3px solid #00ABB3;background-color: #EAEAEA;")            
+            self.timer_button.setText('15s (Demo) ')
+            self.timer_button.setFixedSize(QSize(150,60))
+            self.timer_button_count = 3
+            time_to_sleep_in_seconds = 15
+            self.sleep_timer.start(time_to_sleep_in_seconds*1000)
+
+        elif self.timer_button_count == 3:
             self.timer_button.setToolTip("No timer set")
             self.timer_button.setStyleSheet("border: 1px solid #070707;background-color: #B2B2B2;")           
             self.timer_button.setText('No timer')
             self.timer_button.setFixedSize(QSize(150,60))
             self.timer_button_count = 0
+        
+        
+        
+    
+    def closeEvent(self):
+        self.playlist.songServiceObject.stop()
+        self.close()
 
 
     def VolumeSliderMovement(self):

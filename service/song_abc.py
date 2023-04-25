@@ -36,7 +36,9 @@ class SongServiceBase(ABC):
     @abstractmethod
     def get_song_position(self):
         pass
-    
+    @abstractmethod
+    def move_song_to_position(self,position):
+        pass
     @staticmethod
     @abstractmethod
     def increase_and_return_new_volume(from_vol, diff):
@@ -58,3 +60,7 @@ class SongServiceBase(ABC):
         pass
         
      
+    @staticmethod
+    @abstractmethod
+    def the_song_is_playing(self):
+        pass

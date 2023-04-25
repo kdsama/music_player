@@ -45,3 +45,8 @@ class PlaylistServiceABC(ABC):
     @abstractmethod
     def last_played_song(self):
         pass
+
+
+    @abstractmethod
+    def the_song_is_playing(self):
+        pass

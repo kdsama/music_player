@@ -30,6 +30,7 @@ def metaData(song_path):
 def get_song_position():
     
     pos = pygame.mixer.music.get_pos() / 1000
+    print("<<"+str(pos)+">>")
     return pos
 
 
@@ -53,14 +54,10 @@ def load(song_path):
     return audio
 
 def play(song_path):
-    # pygame.mixer.init()
+    
     load(song_path)
-    print("Song path loaded now is ",song_path)
     save_current_music(song_path)  
     pygame.mixer.music.play()
-    #The audio will not play without the wait below 
-
-    # wait(int(audio.info.length * 1000))
 
 
 def wait(n):
@@ -85,7 +82,6 @@ def resume():
     pygame.mixer.music.unpause()
 
 def fast_forward(current_time=0):
-
     
     new_time = pygame.mixer.music.get_pos()/1000 +  current_time 
     pygame.mixer.music.set_pos(new_time)
