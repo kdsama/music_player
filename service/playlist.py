@@ -61,17 +61,9 @@ class PlaylistService(PlaylistServiceABC):
 
             self.songServiceObject = SongService(self.songs[index])
             song_id = self.songServiceObject.play()     
-            for i in range (index+1,len(self.songs)):
-                print("Are we here yet ??")
-                self.songServiceObject = SongService(song)            
-                song_id = self.songServiceObject.play()                
-            
-                return 
-        
-        for song in self.songs :         
-            print(song)    
-            self.songServiceObject = SongService(song)            
-            song_id = self.songServiceObject.play()
+        else:
+            self.songServiceObject = SongService(self.songs[0])
+            song_id = self.songServiceObject.play()     
 
     def next(self):
         
@@ -94,6 +86,7 @@ class PlaylistService(PlaylistServiceABC):
     def previous(self):
         
         self.current_song_index -=1 
+        print(self.current_song_index)
         #If index goes above 
         if self.current_song_index < 0:
             if self.loop:

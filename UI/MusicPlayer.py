@@ -7,6 +7,7 @@ from service.playlist import PlaylistService
 from service.song import SongService
 from UI.components.volume import Volume
 from UI.components.help import Help
+import random 
 from db import song
 import os
 START = "Start"
@@ -60,9 +61,7 @@ class MusicPlayerApp(QMainWindow):
         # Create song image
         self.Image = QLabel(self)
         self.Image.setFixedSize(QSize(200,200))
-        pixmap = QPixmap('UI/img/pic.png')
-        #pixmap4 = pixmap.scaled(64, 64, Qt.KeepAspectRatio)
-        self.Image.setPixmap(pixmap)
+
         
 
         # Create play control buttons
@@ -305,9 +304,6 @@ class MusicPlayerApp(QMainWindow):
         else : 
             self.rewind(int(self.sliderPos-new_pos))
 
-        # self.move_song_to_position(self.position_slider.value())
-        # self.position_slider.setValue(self.position_slider.value())  
-
         self.timer.start(1000)
 
     def play_music(self):
@@ -321,7 +317,7 @@ class MusicPlayerApp(QMainWindow):
     def toggle_music(self):
         self.timer.start(1000)
 
-        self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
+        self.refresh_slider_info()
         if self.playlist.get_playlist_length() == 0 :
             
             return 
@@ -351,11 +347,38 @@ class MusicPlayerApp(QMainWindow):
     def update_lyrics(self, lyrics):
         pass
 
+    # Set the title name of the song. Whenever you select a song , you are shown which current song is being played.
+    def set_player_title(self,name=""):
+        if name == "":
+            name_list = SongService.get_song_names_from_pathurls([self.playlist.songs[self.playlist.current_song_index]])
+            self.song_name.setText(name_list[0])
+        else : 
+            self.song_name.setText(name)
+
+    def refresh_image(self):
+        
+        pixmap = QPixmap('UI/img/'+str(random.randInt(1,12)))
+        #pixmap4 = pixmap.scaled(64, 64, Qt.KeepAspectRatio)
+        self.Image.setPixmap(pixmap)
+    def refresh_slider_info(self):
+        self.refresh_image()
+        self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
+        self.position_slider.setMinimum(0)
+        self.position_slider.setValue(0)
+
+
     def next_music(self):
         self.playlist.next()
+        self.set_player_title()
+        self.refresh_slider_info()
+        # get song name of the next song and set Name to it 
+
+
 
     def prev_music(self):
         self.playlist.previous()
+        self.set_player_title()
+        self.refresh_slider_info()
 
     def move_song_to_position(self,slider_pos):
         self.playlist.songServiceObject.move_song_to_position(slider_pos)
@@ -397,17 +420,15 @@ class MusicPlayerApp(QMainWindow):
     def play_song_and_set_song_name(self):
 
         #play song
-
-        #sets Qlabel with selected song
         name = self.music_list.currentItem().text()
-        self.song_name.setText(name)
-        # self.playlist.play_song_by_pathurl(name)
+        self.set_player_title(name)        
         self.playlist.play_song_by_name(name)
-        #self.playlist.songServiceObject.resume()
+
         self.is_song_paused = False
         self.LastOpenedSong = False
         self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
         self.toggle_button.setToolTip("Pause song")
+        self.refresh_slider_info()
 
 
     def refresh_playlist(self):
