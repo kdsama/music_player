@@ -52,17 +52,23 @@ def CheckOrInsertSong(metadata):
     
 def get_all_songs():
     # Query to join the song and activity tables on song id
-
+    
     query = "SELECT * from song"
+    c.execute(query)
     results = c.fetchall()
+    
     conn.commit()
+    
     if results is None:
+        print("No result why ?")
         # No songs have been played yet, return an empty list
         return []
     else:
         # Return a list of dictionaries with song information and last song position
         songs = []
+        
         for result in results:
+            
             song = {
                 'title': result[1],
                 'album': result[2],
