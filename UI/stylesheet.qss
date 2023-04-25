@@ -1,3 +1,13 @@
+QLabel#Help_label {
+ color: #B2B2B2;
+ font-weight: 600;
+ border: 1px solid yellow;
+ border-radius: 2px;
+ padding: 50px 50px 50px 50px;
+ background-color:#3C4048;
+  
+}
+
 QLabel {
   color: #B2B2B2;/*#464d55;*/
   font-weight: 600;
@@ -42,7 +52,14 @@ QMainWindow {
     width: 5px; /* when vertical */
     /*height: 1px; when horizontal */
 }
+QListWidget{
+    background: #F6F1F1;
+                }
 
+QMenuBar {
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                      stop:0 lightgray, stop:1 darkgray);
+}
 
 QDockWidget {
     border: 1px solid black;
@@ -57,6 +74,7 @@ QDockWidget::title {
 
     padding-left: 1px;
 }
+
 
 QSlider::groove:horizontal {
     border: 1px solid #999999;

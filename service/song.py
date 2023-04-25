@@ -1,7 +1,5 @@
 from utils import song as SongFunction
 from db.song import CheckOrInsertSong,get_all_songs
-from db.song import CheckOrInsertSong,get_all_songs
-import utils.song
 import pygame 
 
 pygame.mixer.init()
