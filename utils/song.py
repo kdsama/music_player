@@ -30,7 +30,6 @@ def metaData(song_path):
 def get_song_position():
     
     pos = pygame.mixer.music.get_pos() / 1000
-    print("<<"+str(pos)+">>")
     return pos
 
 

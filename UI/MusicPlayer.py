@@ -167,15 +167,6 @@ class MusicPlayerApp(QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_slider)
 
-
-        # # # Create lyrics area
-        # # lyrics_label = QLabel("Lyrics:", self)
-        # # self.lyrics_area = QTextEdit(self)
-        # # self.lyrics_area.setReadOnly(True)
-        # # Create music player list
-        # self.music_list = QListWidget(self)
-
-
       # Create Playlist dock
         self.dock = QDockWidget('PlayLists',self)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
@@ -316,17 +307,25 @@ class MusicPlayerApp(QMainWindow):
     def update_slider(self):
         # print(self.playlist.songServiceObject.get_song_position())
         
-        self.sliderPos+=1
-        self.position_slider.setValue(self.sliderPos)
+        
+        self.position_slider.setValue(self.playlist.songServiceObject.get_song_position())
+        self.sliderPos = self.playlist.songServiceObject.get_song_position()
         # self.change_song_check()        
 
     def update_song_position(self):
         self.timer.stop()
-        print(self.position_slider.value(),"this is the value ")
-        self.move_song_to_position(self.position_slider.value())
-        self.position_slider.setValue(self.position_slider.value())    
-        self.sliderPos = self.position_slider.value() 
-        
+        #  get previous song position 
+        # subtract it with current Slider position 
+        #  and use the fast forward to rewind option accordingly 
+        new_pos = self.position_slider.value()
+        if self.sliderPos < new_pos : 
+            self.fast_forward(int(new_pos-self.sliderPos))
+        else : 
+            self.rewind(int(self.sliderPos-new_pos))
+
+        # self.move_song_to_position(self.position_slider.value())
+        # self.position_slider.setValue(self.position_slider.value())  
+
         self.timer.start(1000)
 
     def play_music(self):
@@ -379,13 +378,13 @@ class MusicPlayerApp(QMainWindow):
     def move_song_to_position(self,slider_pos):
         self.playlist.songServiceObject.move_song_to_position(slider_pos)
 
-    def fast_forward(self):
+    def fast_forward(self,seconds=10):
         self.next_time_check = True
-        self.playlist.songServiceObject.go_front(10)
+        self.playlist.songServiceObject.go_front(seconds)
 
-    def rewind(self):
+    def rewind(self,seconds=10):
         self.prev_time_check = True
-        self.playlist.songServiceObject.go_back(10)
+        self.playlist.songServiceObject.go_back(seconds)
     
     def set_volume(self):
         self.start_volume = SongService.increase_and_return_new_volume(self.start_volume,0.0)
