@@ -94,7 +94,6 @@ def fast_forward(current_time=0):
 def wait_for_music_to_end():
         while pygame.mixer.music.get_busy():
             pygame.event.pump()
-            
             pygame.time.wait(10)   
 
 
