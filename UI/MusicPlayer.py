@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication,QDockWidget, QMainWindow,QHBoxLayout,QGridLayout, QMenuBar, QMenu, QAction, QFileDialog,QLineEdit, QListWidget, QPushButton, QVBoxLayout, QWidget, QSlider, QLabel, QTextEdit
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtCore import QUrl, Qt,QSize, QTimer
+from PyQt5.QtCore import QUrl, Qt,QSize, QTimer, QEvent
 from PyQt5.QtGui import QPixmap, QIcon,QPainter,QBrush,QColor
 from UI.play import MusicPlayer
 from service.playlist import PlaylistService
@@ -160,10 +160,12 @@ class MusicPlayerApp(QMainWindow):
 
         # Create search bar
         self.SearchBar = QLineEdit()
+        self.SearchBar.installEventFilter(self)
+        self.SearchBar.textChanged.connect(self.search_playlist)
 
         #set place holder text for search bar
         self.SearchBar.setPlaceholderText("Search here...")
-        # self.SearchBar.keyPressEvent
+        
         #self.dock_layout = QVBoxLayout()
         self.dock.setTitleBarWidget(self.SearchBar)
         self.dummy_widget = QWidget()
@@ -232,10 +234,15 @@ class MusicPlayerApp(QMainWindow):
         self.sleep_timer = QTimer()
         self.sleep_timer.timeout.connect(self.closeEvent)
                 
-
+    def eventFilter(self, source, event):
+        if (event.type() == QEvent.KeyPress and
+            source is self.SearchBar):
+            return super(MusicPlayerApp, self).eventFilter(source, event)
+        return False
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Space:
+        
+        if event.key() == Qt.Key_Space or event.key() == Qt.Key_P:
             self.toggle_music()
         elif event.key() == Qt.Key_Left and event.modifiers() == Qt.ControlModifier:
             self.reduce_volume()
@@ -318,6 +325,13 @@ class MusicPlayerApp(QMainWindow):
         
         # self.change_song_check()        
 
+    def search_playlist(self,text):
+        if text == "":
+            self.refresh_playlist()
+        else : 
+            self.music_list.clear()
+            self.music_list.addItems(self.playlist.get_song_by_partial_input(text))
+
     def update_song_position(self):
         self.timer.stop()
         #  get previous song position 
@@ -381,7 +395,7 @@ class MusicPlayerApp(QMainWindow):
 
     def refresh_image(self):        
         img = self.playlist.current_song_index % 12 + 1 
-        print(img)
+        
         pixmap = QPixmap('UI/random_stock_images/'+str(img))
         self.Image.setPixmap(pixmap)
         
@@ -402,6 +416,7 @@ class MusicPlayerApp(QMainWindow):
         self.playlist.next()
         self.set_player_title()
         self.refresh_slider_info()
+        self.refresh_playlist()
         # get song name of the next song and set Name to it 
 
 
@@ -410,6 +425,7 @@ class MusicPlayerApp(QMainWindow):
         self.playlist.previous()
         self.set_player_title()
         self.refresh_slider_info()
+        self.refresh_playlist()
 
     def move_song_to_position(self,slider_pos):
         self.playlist.songServiceObject.move_song_to_position(slider_pos)
@@ -464,6 +480,7 @@ class MusicPlayerApp(QMainWindow):
 
 
     def refresh_playlist(self):
+        self.SearchBar.clear()
         self.music_list.clear()
         try :
             song_name_list = SongService.get_song_names_from_pathurls(self.playlist.songs)

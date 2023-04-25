@@ -65,4 +65,8 @@ class SongServiceBase(ABC):
     def the_song_is_playing(self):
         pass
     
+    @staticmethod
+    @abstractmethod
+    def get_song_info_from_pathurl(self,path):
+        pass
     

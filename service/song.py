@@ -59,7 +59,17 @@ class SongService:
 
         return name 
 
-    
+    @staticmethod
+    def get_song_info_from_pathurl(path):
+        song_object = {}
+        try :
+            song_object = path_name_metadata[path]
+            print("SONG_OBJECT IS ",song_object)
+            
+        except Exception as e : 
+            song_object =  SongFunction.metaData(path)
+
+        return song_object     
 
 
     @staticmethod

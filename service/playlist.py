@@ -118,3 +118,12 @@ class PlaylistService(PlaylistServiceABC):
         if song is None : 
             return ""
         return song["path"]
+    
+    def get_song_by_partial_input(self,text):
+        song_names = []
+        for song in self.songs : 
+            song_meta = SongService.get_song_info_from_pathurl(song)
+            print(song_meta)
+            if text in song_meta["artist"] or text in song_meta["title"] or text in song_meta["album"] :
+                song_names.append(song_meta["title"])
+        return song_names

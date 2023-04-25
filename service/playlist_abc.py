@@ -50,3 +50,7 @@ class PlaylistServiceABC(ABC):
     @abstractmethod
     def the_song_is_playing(self):
         pass
+
+    @abstractmethod
+    def get_song_by_partial_input(self,text):
+        pass
