@@ -221,7 +221,12 @@ class MusicPlayerApp(QMainWindow):
         #self.music_list.currentItemChanged.connect(lambda: print("Item Changed Signal"))
         name = self.music_list.item(0)
         #self.music_list.setCurrentItem(name)
-        self.song_name.setText(name.text())
+        # Fresh installation , there might not be a preloaded song 
+        try : 
+            self.song_name.setText(name.text())
+            self.refresh_image()
+        except Exception as e : 
+            self.song_name.setText("")
 
         self.set_volume()
         self.sleep_timer = QTimer()
@@ -293,7 +298,9 @@ class MusicPlayerApp(QMainWindow):
         pass
 
     def update_slider(self):
-        # print(self.playlist.songServiceObject.get_song_position())
+        # Dont do anything if there is no songs 
+        if len(self.playlist.songs) == 0 : 
+            return 
         
         song_position = self.playlist.songServiceObject.get_song_position()
         self.position_slider.setValue(song_position)
@@ -333,11 +340,14 @@ class MusicPlayerApp(QMainWindow):
 # Depending on the nature pause and play the song . 
     def toggle_music(self):
         self.timer.start(1000)
-
-        self.refresh_slider_info()
+        
+        
         if self.playlist.get_playlist_length() == 0 :
             
+
+            self.timer.stop()
             return 
+        self.refresh_slider_info()
         if not self.is_song_paused:
             if not self.LastOpenedSong :
                 self.playlist.songServiceObject.pause()
@@ -370,8 +380,14 @@ class MusicPlayerApp(QMainWindow):
             self.song_name.setText(name)
 
     def refresh_image(self):        
-        pixmap = QPixmap('UI/img/'+str(random.randint(1,12)))
+        img = self.playlist.current_song_index % 12 + 1 
+        print(img)
+        pixmap = QPixmap('UI/random_stock_images/'+str(img))
         self.Image.setPixmap(pixmap)
+        
+        pixmap.scaledToWidth(64)
+        pixmap.scaledToHeight(64)
+
         
     def refresh_slider_info(self):
         self.refresh_image()
@@ -382,6 +398,7 @@ class MusicPlayerApp(QMainWindow):
 
 
     def next_music(self):
+        
         self.playlist.next()
         self.set_player_title()
         self.refresh_slider_info()
@@ -442,6 +459,7 @@ class MusicPlayerApp(QMainWindow):
         self.LastOpenedSong = False
         self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
         self.toggle_button.setToolTip("Pause song")
+        print("WTFFFFFFFFFFFFFFFFFFFFFFFF")
         self.refresh_slider_info()
 
 
