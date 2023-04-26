@@ -12,7 +12,12 @@ QLabel {
   color: #B2B2B2;/*#464d55;*/
   font-weight: 600;
 }
-
+QListWidget:item:selected:active {
+  background: #D4FAFC;
+}
+QListWidget:item:selected:!active {
+  background: #D4FAFC;
+}
 QPushButton#timer_button {
   color: black;
   font-weight: 600;

@@ -1,38 +1,22 @@
 from PyQt5.QtWidgets import QApplication,QDockWidget, QMainWindow,QHBoxLayout,QGridLayout, QMenuBar, QMenu, QAction, QFileDialog,QLineEdit, QListWidget, QPushButton, QVBoxLayout, QWidget, QSlider, QLabel, QTextEdit
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtCore import QUrl, Qt,QSize, QTimer
+from PyQt5.QtCore import QUrl, Qt,QSize, QTimer, QEvent
 from PyQt5.QtGui import QPixmap, QIcon,QPainter,QBrush,QColor
 from UI.play import MusicPlayer
 from service.playlist import PlaylistService
 from service.song import SongService
+from UI.components.volume import Volume
+from UI.components.help import Help
+import random 
 from db import song
-
+import os
 START = "Start"
 PAUSE = "Pause"
-
-
-def GetPlayisSongPausedText(isSongPaused):
-        if isSongPaused :
-            return START
-        return PAUSE
-
-class Help(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        self.setWindowTitle("Shortcut Keys")
-        self.label = QLabel()
-        self.label.setObjectName('Help_label')
-        layout = QVBoxLayout()
-        self.label.setText("Play or Pause \t-  Space bar \n\nReduce Volume \t-  Ctrl + Left key \n\nAdd Volume \t-  Ctrl + Right key \n\nRewind \t\t-  A or Left Key \n\nFast forward \t-  D or Right key \n\nPlay previous song \t-  W or Up key \n\nPlay next song \t-  S or Down key")
-        layout.addWidget(self.label)
-        self.setLayout(layout)
+ONE_HOUR_IN_MILISECONDS = 3600000
+HALF_HOUR_IN_MILISECONDS = 1800000
 
 
 
-class Volume(QPushButton):
-    def __init__(self,parent=None):
-        super(Volume,self).__init__(parent)
 
 class MusicPlayerApp(QMainWindow):
     def __init__(self):
@@ -43,7 +27,8 @@ class MusicPlayerApp(QMainWindow):
         self.is_song_paused = False
         self.next_time_check = False
         self.prev_time_check = False
-
+        
+        self.sliderPos = 0 
         self.LastOpenedSong = True 
         # Create window title
         self.setWindowTitle("Minimal Music Player")
@@ -76,29 +61,27 @@ class MusicPlayerApp(QMainWindow):
         # Create song image
         self.Image = QLabel(self)
         self.Image.setFixedSize(QSize(200,200))
-        pixmap = QPixmap('UI/pic.png')
-        #pixmap4 = pixmap.scaled(64, 64, Qt.KeepAspectRatio)
-        self.Image.setPixmap(pixmap)
+
         
 
         # Create play control buttons
         self.toggle_button = QPushButton("")        
         self.toggle_button.clicked.connect(self.toggle_music)
-        self.toggle_button.setIcon(QIcon('UI/Play.png'))
+        self.toggle_button.setIcon(QIcon('UI/img/Play.png'))
         self.toggle_button.setToolTip("Play song")
         self.toggle_button.setFixedSize(QSize(60,60))
 
         # Create next and previous buttons
         next_button = QPushButton("", self)
         next_button.setObjectName('next_button')
-        next_button.setIcon(QIcon('UI/next.png'))
+        next_button.setIcon(QIcon('UI/img/next.png'))
         next_button.setToolTip("click to play next song / hold to fast forward")
         next_button.pressed.connect(self.next_button_pressed)
         next_button.released.connect(self.next_button_released)
         next_button.setFixedSize(QSize(60,60))
 
         prev_button = QPushButton("", self)
-        prev_button.setIcon(QIcon('UI/previous.png'))
+        prev_button.setIcon(QIcon('UI/img/previous.png'))
         prev_button.setToolTip("Click to play previous song / hold to rewind")
         prev_button.pressed.connect(self.prev_button_pressed)
         prev_button.released.connect(self.prev_button_released)
@@ -108,13 +91,13 @@ class MusicPlayerApp(QMainWindow):
         '''
         # Create fast forward and rewind buttons
         fast_button = QPushButton("", self)
-        fast_button.setIcon(QIcon('UI/images/fast_forward.png'))
+        fast_button.setIcon(QIcon('UI/img/images/fast_forward.png'))
         fast_button.setToolTip("Fast forward")
         fast_button.clicked.connect(self.fast_forward)
         fast_button.setFixedSize(QSize(60,60))
 
         rewind_button = QPushButton("", self)
-        rewind_button.setIcon(QIcon('UI/images/rewind.png'))
+        rewind_button.setIcon(QIcon('UI/img/images/rewind.png'))
         rewind_button.setToolTip("Rewind")
         rewind_button.clicked.connect(self.rewind)
         rewind_button.setFixedSize(QSize(60,60))
@@ -122,13 +105,13 @@ class MusicPlayerApp(QMainWindow):
 
         # Create reduce volume and add volume buttons
         reduce_volume_button = Volume(self)
-        reduce_volume_button.setIcon(QIcon('UI/volume_down.png'))
+        reduce_volume_button.setIcon(QIcon('UI/img/volume_down.png'))
         reduce_volume_button.setToolTip("Reduce volume")
         reduce_volume_button.clicked.connect(self.reduce_volume)
         reduce_volume_button.setFixedSize(QSize(60,60))
 
         add_volume_button = QPushButton("", self)
-        add_volume_button.setIcon(QIcon('UI/volume_high.png'))
+        add_volume_button.setIcon(QIcon('UI/img/volume_high.png'))
         add_volume_button.setToolTip("Increase volume")
         add_volume_button.clicked.connect(self.add_volume)
         add_volume_button.setFixedSize(QSize(60,60))
@@ -140,7 +123,7 @@ class MusicPlayerApp(QMainWindow):
 
         # Create loop button
         self.loop_button = QPushButton("")
-        self.loop_button.setIcon(QIcon('UI/repeat.png'))
+        self.loop_button.setIcon(QIcon('UI/img/repeat.png'))
         self.loop_button.setToolTip("Loop playlist")
         self.loop_button.setCheckable(True)
         self.loop_button.clicked.connect(self.call_loop_function)
@@ -148,7 +131,7 @@ class MusicPlayerApp(QMainWindow):
 
         # Create Timer button
         self.timer_button = QPushButton("")
-        self.timer_button.setIcon(QIcon('UI/timer.png'))
+        self.timer_button.setIcon(QIcon('UI/img/timer.png'))
         self.timer_button.setText('No Timer')
         self.timer_button.setToolTip("No timer set")
         self.timer_button.setObjectName('timer_button')
@@ -164,16 +147,6 @@ class MusicPlayerApp(QMainWindow):
         self.position_slider.sliderReleased.connect(self.update_song_position)
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_slider)
-        
-
-
-        # # # Create lyrics area
-        # # lyrics_label = QLabel("Lyrics:", self)
-        # # self.lyrics_area = QTextEdit(self)
-        # # self.lyrics_area.setReadOnly(True)
-        # # Create music player list
-        # self.music_list = QListWidget(self)
-
 
       # Create Playlist dock
         self.dock = QDockWidget('PlayLists',self)
@@ -187,10 +160,12 @@ class MusicPlayerApp(QMainWindow):
 
         # Create search bar
         self.SearchBar = QLineEdit()
+        self.SearchBar.installEventFilter(self)
+        self.SearchBar.textChanged.connect(self.search_playlist)
 
         #set place holder text for search bar
         self.SearchBar.setPlaceholderText("Search here...")
-
+        
         #self.dock_layout = QVBoxLayout()
         self.dock.setTitleBarWidget(self.SearchBar)
         self.dummy_widget = QWidget()
@@ -244,17 +219,32 @@ class MusicPlayerApp(QMainWindow):
         if last_song != "":
             self.playlist.addToPlaylist(last_song)
             self.refresh_playlist()
+            
+            self.music_list.item(0).setSelected(True)
 
         #self.music_list.currentItemChanged.connect(lambda: print("Item Changed Signal"))
         name = self.music_list.item(0)
         #self.music_list.setCurrentItem(name)
-        self.song_name.setText(name.text())
+        # Fresh installation , there might not be a preloaded song 
+        try : 
+            self.song_name.setText(name.text())
+            self.refresh_image()
+        except Exception as e : 
+            self.song_name.setText("")
 
         self.set_volume()
-
+        self.sleep_timer = QTimer()
+        self.sleep_timer.timeout.connect(self.closeEvent)
+                
+    def eventFilter(self, source, event):
+        if (event.type() == QEvent.KeyPress and
+            source is self.SearchBar):
+            return super(MusicPlayerApp, self).eventFilter(source, event)
+        return False
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Space:
+        
+        if event.key() == Qt.Key_Space or event.key() == Qt.Key_P:
             self.toggle_music()
         elif event.key() == Qt.Key_Left and event.modifiers() == Qt.ControlModifier:
             self.reduce_volume()
@@ -265,9 +255,16 @@ class MusicPlayerApp(QMainWindow):
         elif event.key() == Qt.Key_Right or event.key() == Qt.Key_D:
             self.fast_forward()
         elif event.key() == Qt.Key_Up or event.key() == Qt.Key_W:
-            self.prev_music()
+            try : 
+                self.prev_music()
+            except Exception as e : 
+                self.reset_controls_on_edge_songs()
         elif event.key() == Qt.Key_Down or event.key() == Qt.Key_S:
-            self.next_music()
+            try : 
+                self.next_music()
+            except Exception as e : 
+                self.reset_controls_on_edge_songs()
+            
 
 
     def open_music_file(self):
@@ -277,9 +274,12 @@ class MusicPlayerApp(QMainWindow):
             self.playlist.emptyCurrentPlaylist()
             self.playlist.addToPlaylist(music_path)
 
-
+            self.LastOpenedSong = False
             self.play_music()
+            self.timer.start(1000)
             self.refresh_playlist() 
+            self.set_player_title()
+            self.set_list_item_selected()
         # self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
     
     def queue_music_file(self):
@@ -291,13 +291,23 @@ class MusicPlayerApp(QMainWindow):
         if len(self.playlist.songs) == 1 :
             self.playlist.play(0)
             #self.toggle_button.setText(PAUSE)
-            self.toggle_button.setIcon(QIcon('UI/Pause.png'))
+            self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
             self.toggle_button.setToolTip("Pause song")
         self.refresh_playlist()
+        self.set_list_item_selected()
+
+        
         # self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
 
 
-
+    def set_list_item_selected(self):
+        items = self.music_list.findItems(self.song_name.text(),Qt.MatchExactly)
+        
+        for item in items:
+            print(item.text())
+            index = self.music_list.row(item)
+            print(index)
+            self.music_list.item(index).setSelected(True)
         
     def help_menu(self):
         self.h = Help()
@@ -307,78 +317,149 @@ class MusicPlayerApp(QMainWindow):
         self.h.show()
 
     def close_fn(self):
-        pass
+        self.playlist.songServiceObject.stop()
+        self.close()
 
     def update_slider(self):
-        print(self.playlist.songServiceObject.get_song_position())
-        self.position_slider.setValue(self.playlist.songServiceObject.get_song_position())
+        # Dont do anything if there is no songs 
+        if len(self.playlist.songs) == 0 : 
+            return 
+        
+        song_position = self.playlist.songServiceObject.get_song_position()
+        self.position_slider.setValue(song_position)
+        
+        duration = self.playlist.songServiceObject.duration
+        if self.sliderPos - duration < 20 and self.sliderPos  >= song_position:
+            try :
+                self.next_music()
+            except Exception as e : 
+                # Means no next song probably 
+                self.reset_controls_on_edge_songs()
+        else : 
+            
+            self.sliderPos = song_position
+        
+        # self.change_song_check()        
 
+    def search_playlist(self,text):
+        if text == "":
+            self.refresh_playlist()
+            self.set_list_item_selected()
+        else : 
+            self.music_list.clear()
+            self.music_list.addItems(self.playlist.get_song_by_partial_input(text))
 
     def update_song_position(self):
         self.timer.stop()
-
-        slider_position_value = self.position_slider.value()
-
-        # set song relative to the position
-
-
+        #  get previous song position 
+        # subtract it with current Slider position 
+        #  and use the fast forward to rewind option accordingly 
+        new_pos = self.position_slider.value()
+        if self.sliderPos < new_pos : 
+            self.fast_forward(int(new_pos-self.sliderPos))
+        else : 
+            self.rewind(int(self.sliderPos-new_pos))
         self.timer.start(1000)
 
     def play_music(self):
-
         self.playlist.play()
         #self.toggle_button.setText(PAUSE)
-        self.toggle_button.setIcon(QIcon('UI/Pause.png'))
+        self.refresh_slider_info()
+        self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
         self.toggle_button.setToolTip("Pause song")
 
 # Depending on the nature pause and play the song . 
     def toggle_music(self):
         self.timer.start(1000)
-
-        self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
+        
+        
         if self.playlist.get_playlist_length() == 0 :
-            print("We coming here ?")
+            
+
+            self.timer.stop()
             return 
+        self.refresh_slider_info()
         if not self.is_song_paused:
             if not self.LastOpenedSong :
                 self.playlist.songServiceObject.pause()
                 self.is_song_paused = True 
                 #self.toggle_button.setText(START)
-                self.toggle_button.setIcon(QIcon('UI/Play.png'))
+                self.toggle_button.setIcon(QIcon('UI/img/Play.png'))
                 self.toggle_button.setToolTip("Play song")
+                print("song pause")
+                self.timer.stop()
             else:
-                print("but we are xoming hee")
+                
                 self.LastOpenedSong = False
                 self.play_music()
+                print('last song pause')
                 
         else:
             self.playlist.songServiceObject.resume()
             self.is_song_paused = False
             #self.toggle_button.setText(PAUSE)
-            self.toggle_button.setIcon(QIcon('UI/Pause.png'))
+            self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
             self.toggle_button.setToolTip("Pause song")
+
             
     def toggleLoop(self):
         self.playlist.toggleLoop()
 
 
-    def update_lyrics(self, lyrics):
-        pass
+    # Set the title name of the song. Whenever you select a song , you are shown which current song is being played.
+    def set_player_title(self,name=""):
+        if name == "":
+            name_list = SongService.get_song_names_from_pathurls([self.playlist.songs[self.playlist.current_song_index]])
+            self.song_name.setText(name_list[0])
+        else : 
+            self.song_name.setText(name)
+
+    def refresh_image(self):        
+        img = self.playlist.current_song_index % 12 + 1 
+        
+        pixmap = QPixmap('UI/random_stock_images/'+str(img))
+        self.Image.setPixmap(pixmap)
+        
+        pixmap.scaledToWidth(64)
+        pixmap.scaledToHeight(64)
+
+        
+    def refresh_slider_info(self):
+        self.refresh_image()
+        self.sliderPos = 0 
+        self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
+        self.position_slider.setMinimum(0)
+        self.position_slider.setValue(0)
+
 
     def next_music(self):
+        
         self.playlist.next()
+        self.set_player_title()
+        self.refresh_slider_info()
+        self.refresh_playlist()
+        self.set_list_item_selected()
+        # get song name of the next song and set Name to it 
+
+
 
     def prev_music(self):
         self.playlist.previous()
+        self.set_player_title()
+        self.refresh_slider_info()
+        self.refresh_playlist()
+        self.set_list_item_selected()
 
-    def fast_forward(self):
+    def move_song_to_position(self,slider_pos):
+        self.playlist.songServiceObject.move_song_to_position(slider_pos)
+
+    def fast_forward(self,seconds=10):
         self.next_time_check = True
-        print("we coming here or not for fastforward ???")
-        self.playlist.songServiceObject.go_front(10)
+        self.playlist.songServiceObject.go_front(seconds)
 
-    def rewind(self):
+    def rewind(self,seconds=10):
         self.prev_time_check = True
-        self.playlist.songServiceObject.go_back(10)
+        self.playlist.songServiceObject.go_back(seconds)
     
     def set_volume(self):
         self.start_volume = SongService.increase_and_return_new_volume(self.start_volume,0.0)
@@ -409,51 +490,74 @@ class MusicPlayerApp(QMainWindow):
     def play_song_and_set_song_name(self):
 
         #play song
-
-        #sets Qlabel with selected song
         name = self.music_list.currentItem().text()
-        self.song_name.setText(name)
-        # self.playlist.play_song_by_pathurl(name)
+        print(name)
+        self.set_player_title(name)        
         self.playlist.play_song_by_name(name)
-        #self.playlist.songServiceObject.resume()
+
         self.is_song_paused = False
         self.LastOpenedSong = False
-        self.toggle_button.setIcon(QIcon('UI/Pause.png'))
+        self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
         self.toggle_button.setToolTip("Pause song")
+        print("WTFFFFFFFFFFFFFFFFFFFFFFFF")
+        self.refresh_slider_info()
+        self.timer.start(1000)
+        
 
 
     def refresh_playlist(self):
+        self.SearchBar.clear()
         self.music_list.clear()
         try :
             song_name_list = SongService.get_song_names_from_pathurls(self.playlist.songs)
-            print(song_name_list)
             self.music_list.addItems(song_name_list)
         except Exception as e : 
             self.music_list.addItems(self.playlist.songs)
 
 
     def call_timer_function(self):
+        time_to_sleep_in_seconds = 0
         if self.timer_button_count == 0:
             self.timer_button.setToolTip("Pause after 30 minutes")
             self.timer_button.setStyleSheet("border: 3px solid #00ABB3;background-color: #EAEAEA;")
-            self.timer_button.setText('30 minutes')
+            self.timer_button.setText('30 minutes ')
             self.timer_button.setFixedSize(QSize(150,60))
             self.timer_button_count = 1
+            time_to_sleep_in_seconds = HALF_HOUR_IN_MILISECONDS
+            self.sleep_timer.start(time_to_sleep_in_seconds*1000)
             #self.toggleTimer()
 
         elif self.timer_button_count == 1:
             self.timer_button.setToolTip("Pause after 1 hour")
             self.timer_button.setStyleSheet("border: 3px solid #00ABB3;background-color: #EAEAEA;")            
-            self.timer_button.setText('1 hour')
+            self.timer_button.setText('1 hour ')
             self.timer_button.setFixedSize(QSize(150,60))
             self.timer_button_count = 2
-
+            time_to_sleep_in_seconds = ONE_HOUR_IN_MILISECONDS
+            self.sleep_timer.start(time_to_sleep_in_seconds)
+        
         elif self.timer_button_count == 2:
+            self.timer_button.setToolTip("Pause after 1 hour")
+            self.timer_button.setStyleSheet("border: 3px solid #00ABB3;background-color: #EAEAEA;")            
+            self.timer_button.setText('15s (Demo) ')
+            self.timer_button.setFixedSize(QSize(150,60))
+            self.timer_button_count = 3
+            time_to_sleep_in_seconds = 15
+            self.sleep_timer.start(time_to_sleep_in_seconds*1000)
+
+        elif self.timer_button_count == 3:
             self.timer_button.setToolTip("No timer set")
             self.timer_button.setStyleSheet("border: 1px solid #070707;background-color: #B2B2B2;")           
             self.timer_button.setText('No timer')
             self.timer_button.setFixedSize(QSize(150,60))
             self.timer_button_count = 0
+        
+        
+        
+    
+    def closeEvent(self):
+        self.playlist.songServiceObject.stop()
+        self.close()
 
 
     def VolumeSliderMovement(self):
@@ -470,7 +574,23 @@ class MusicPlayerApp(QMainWindow):
             self.next_time_check = False
         else:
             self.next_time_check = False
-            self.next_music()
+            try : 
+                self.next_music()
+                self.is_song_paused = False
+                #self.toggle_button.setText(PAUSE)
+                self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
+                self.toggle_button.setToolTip("Pause song")
+                self.timer.start(1000)
+
+            except Exception as e : 
+                self.reset_controls_on_edge_songs()
+
+
+    # If we reach at the end of the songs 
+    def reset_controls_on_edge_songs(self):
+        self.position_slider.setValue(0)
+        self.timer.stop()
+        # self.toggle_music()
 
     def prev_button_pressed(self):
         self.tp.start(1000)
@@ -481,7 +601,18 @@ class MusicPlayerApp(QMainWindow):
             self.prev_time_check = False
         else:
             self.prev_time_check = False
-            self.prev_music()
+            try : 
+                self.prev_music()
+                self.is_song_paused = False
+                #self.toggle_button.setText(PAUSE)
+                self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
+                self.toggle_button.setToolTip("Pause song")
+                self.timer.start(1000)
+            except Exception as e : 
+                # Means we are at first or last song 
+                self.reset_controls_on_edge_songs()
+
+
 
 
 
