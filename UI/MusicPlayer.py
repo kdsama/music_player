@@ -313,7 +313,8 @@ class MusicPlayerApp(QMainWindow):
         self.position_slider.setValue(song_position)
         
         duration = self.playlist.songServiceObject.duration
-        if self.sliderPos - duration < 20 and self.sliderPos  >= song_position:
+        if self.sliderPos - duration < 20 and self.sliderPos  >= song_position and not self.is_song_paused:
+            
             try :
                 self.next_music()
             except Exception as e : 
