@@ -27,7 +27,7 @@ class MusicPlayerApp(QMainWindow):
         self.is_song_paused = False
         self.next_time_check = False
         self.prev_time_check = False
-        
+        self.is_song_reversed = False 
         self.sliderPos = 0 
         self.LastOpenedSong = True 
         # Create window title
@@ -313,7 +313,7 @@ class MusicPlayerApp(QMainWindow):
         self.position_slider.setValue(song_position)
         
         duration = self.playlist.songServiceObject.duration
-        if self.sliderPos - duration < 20 and self.sliderPos  >= song_position and not self.is_song_paused:
+        if self.sliderPos - duration < 20 and self.sliderPos  >= song_position and not self.is_song_paused and not self.is_song_reversed:
             
             try :
                 self.next_music()
@@ -321,7 +321,7 @@ class MusicPlayerApp(QMainWindow):
                 # Means no next song probably 
                 self.reset_controls_on_edge_songs()
         else : 
-            
+            self.is_song_reversed = False 
             self.sliderPos = song_position
         
         # self.change_song_check()        
@@ -342,6 +342,8 @@ class MusicPlayerApp(QMainWindow):
         if self.sliderPos < new_pos : 
             self.fast_forward(int(new_pos-self.sliderPos))
         else : 
+            self.is_song_reversed = True 
+        
             self.rewind(int(self.sliderPos-new_pos))
         self.timer.start(1000)
 
@@ -476,7 +478,7 @@ class MusicPlayerApp(QMainWindow):
         self.LastOpenedSong = False
         self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
         self.toggle_button.setToolTip("Pause song")
-        print("WTFFFFFFFFFFFFFFFFFFFFFFFF")
+    
         self.refresh_slider_info()
 
 
@@ -566,6 +568,7 @@ class MusicPlayerApp(QMainWindow):
 
     def prev_button_released(self):
         self.tp.stop()
+
         if self.prev_time_check:
             self.prev_time_check = False
         else:
@@ -575,6 +578,7 @@ class MusicPlayerApp(QMainWindow):
             except Exception as e : 
                 # Means we are at first or last song 
                 self.reset_controls_on_edge_songs()
+        
 
 
 
