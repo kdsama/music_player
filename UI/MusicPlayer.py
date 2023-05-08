@@ -219,6 +219,8 @@ class MusicPlayerApp(QMainWindow):
         if last_song != "":
             self.playlist.addToPlaylist(last_song)
             self.refresh_playlist()
+            
+            self.music_list.item(0).setSelected(True)
 
         #self.music_list.currentItemChanged.connect(lambda: print("Item Changed Signal"))
         name = self.music_list.item(0)
@@ -272,9 +274,12 @@ class MusicPlayerApp(QMainWindow):
             self.playlist.emptyCurrentPlaylist()
             self.playlist.addToPlaylist(music_path)
 
-
+            self.LastOpenedSong = False
             self.play_music()
+            self.timer.start(1000)
             self.refresh_playlist() 
+            self.set_player_title()
+            self.set_list_item_selected()
         # self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
     
     def queue_music_file(self):
@@ -289,10 +294,20 @@ class MusicPlayerApp(QMainWindow):
             self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
             self.toggle_button.setToolTip("Pause song")
         self.refresh_playlist()
+        self.set_list_item_selected()
+
+        
         # self.position_slider.setMaximum(self.playlist.songServiceObject.duration)
 
 
-
+    def set_list_item_selected(self):
+        items = self.music_list.findItems(self.song_name.text(),Qt.MatchExactly)
+        
+        for item in items:
+            
+            index = self.music_list.row(item)
+            
+            self.music_list.item(index).setSelected(True)
         
     def help_menu(self):
         self.h = Help()
@@ -302,7 +317,8 @@ class MusicPlayerApp(QMainWindow):
         self.h.show()
 
     def close_fn(self):
-        pass
+        self.playlist.songServiceObject.stop()
+        self.close()
 
     def update_slider(self):
         # Dont do anything if there is no songs 
@@ -329,6 +345,7 @@ class MusicPlayerApp(QMainWindow):
     def search_playlist(self,text):
         if text == "":
             self.refresh_playlist()
+            self.set_list_item_selected()
         else : 
             self.music_list.clear()
             self.music_list.addItems(self.playlist.get_song_by_partial_input(text))
@@ -372,10 +389,13 @@ class MusicPlayerApp(QMainWindow):
                 #self.toggle_button.setText(START)
                 self.toggle_button.setIcon(QIcon('UI/img/Play.png'))
                 self.toggle_button.setToolTip("Play song")
+                
+                self.timer.stop()
             else:
                 
                 self.LastOpenedSong = False
                 self.play_music()
+                
                 
         else:
             self.playlist.songServiceObject.resume()
@@ -383,6 +403,7 @@ class MusicPlayerApp(QMainWindow):
             #self.toggle_button.setText(PAUSE)
             self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
             self.toggle_button.setToolTip("Pause song")
+
             
     def toggleLoop(self):
         self.playlist.toggleLoop()
@@ -420,6 +441,7 @@ class MusicPlayerApp(QMainWindow):
         self.set_player_title()
         self.refresh_slider_info()
         self.refresh_playlist()
+        self.set_list_item_selected()
         # get song name of the next song and set Name to it 
 
 
@@ -429,6 +451,7 @@ class MusicPlayerApp(QMainWindow):
         self.set_player_title()
         self.refresh_slider_info()
         self.refresh_playlist()
+        self.set_list_item_selected()
 
     def move_song_to_position(self,slider_pos):
         self.playlist.songServiceObject.move_song_to_position(slider_pos)
@@ -478,8 +501,10 @@ class MusicPlayerApp(QMainWindow):
         self.LastOpenedSong = False
         self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
         self.toggle_button.setToolTip("Pause song")
-    
+        
         self.refresh_slider_info()
+        self.timer.start(1000)
+        
 
 
     def refresh_playlist(self):
@@ -553,6 +578,12 @@ class MusicPlayerApp(QMainWindow):
             self.next_time_check = False
             try : 
                 self.next_music()
+                self.is_song_paused = False
+                #self.toggle_button.setText(PAUSE)
+                self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
+                self.toggle_button.setToolTip("Pause song")
+                self.timer.start(1000)
+
             except Exception as e : 
                 self.reset_controls_on_edge_songs()
 
@@ -575,11 +606,14 @@ class MusicPlayerApp(QMainWindow):
             self.prev_time_check = False
             try : 
                 self.prev_music()
+                self.is_song_paused = False
+                #self.toggle_button.setText(PAUSE)
+                self.toggle_button.setIcon(QIcon('UI/img/Pause.png'))
+                self.toggle_button.setToolTip("Pause song")
+                self.timer.start(1000)
             except Exception as e : 
                 # Means we are at first or last song 
                 self.reset_controls_on_edge_songs()
-        
-
 
 
 
